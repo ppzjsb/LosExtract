@@ -19,10 +19,10 @@ To compile the code, at the command line type:
 make
 
 To run the code, at the command line type:
-./LosExtract &lt;path&rt;
+./LosExtract &lt;path&gt;
 
 where:
-&lt;path&rt;     (path to LOS files)
+&lt;path&gt;     (path to LOS files)
 
 After running a binary output file will appear in the directory
 containing the LOS files.
