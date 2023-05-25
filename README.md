@@ -19,10 +19,10 @@ To compile the code, at the command line type:
 make
 
 To run the code, at the command line type:
-./LosExtract <path> 
+./LosExtract &lt path &rt
 
 where:
-<path>     (path to LOS files)
+&lt path &rt     (path to LOS files)
 
 After running a binary output file will appear in the directory
 containing the LOS files.
@@ -51,8 +51,8 @@ Puchwein et al. 2022, MNRAS, 519, 6162.
 
 Some other models from these papers are also included in case useful
 
-Haardt & Madau, 2012, ApJ, 746, 125.
-Khaire & Srianand, 2019, MNRAS, 484, 4174.
+Haardt &amp Madau, 2012, ApJ, 746, 125.
+Khaire &amp Srianand, 2019, MNRAS, 484, 4174.
 Faucher-Giguere 2020, MNRAS, 493, 1614.
 
 idl_readdata/ contains a simple IDL code that reads in the output from
