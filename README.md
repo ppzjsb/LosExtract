@@ -46,14 +46,14 @@ Gadget-4.  These can be selected within parameters.h.  Currently these
 are mainly variations on the Puchwein et al. 2019 model used for the
 Sherwood-Relics project.  See e.g.
 
-Puchwein et al. 2019, MNRAS, 485, 47
-Puchwein et al. 2022, MNRAS submitted, arXiv:
+Puchwein et al. 2019, MNRAS, 485, 47.
+Puchwein et al. 2022, MNRAS, 519, 6162.
 
 Some other models from these papers are also included in case useful
 
-Haardt & Madau, 2012, ApJ, 746, 125
-Khaire & Srianand, 2019, MNRAS, 484, 4174
-Faucher-Giguere 2020, MNRAS, 493, 1614 
+Haardt & Madau, 2012, ApJ, 746, 125.
+Khaire & Srianand, 2019, MNRAS, 484, 4174.
+Faucher-Giguere 2020, MNRAS, 493, 1614.
 
 idl_readdata/ contains a simple IDL code that reads in the output from
 SpecExtract.
