@@ -1,3 +1,4 @@
+
 #########################################################################
 #									#
 #  LosExtract can be run on a Gadget-3/4  LOS file to extract		#
@@ -8,11 +9,11 @@
 
 #--------------------------------------- Compile-time options
 
-#OPTS +=-DOPENMP
+OPTS +=-DOPENMP
 #OPTS +=-DTAU_WEIGHT
 #OPTS +=-DSELF_SHIELD
 #OPTS +=-DNO_PECVEL
-#OPTS +=-DVOIGT
+OPTS +=-DVOIGT
 #OPTS +=-DQUICK_GAUSS
 #OPTS +=-DTEST_KERNEL
 
@@ -25,7 +26,7 @@ SYSTYPE="macbook13"
 ifeq ($(SYSTYPE),"pppzjsb02")
 CC = gcc	
 OPTIMIZE = -O3
-CFLAGS   =  $(OPTIMIZE) 
+CFLAGS   =  $(OPTIMIZE) -Wall 
 OMPINCL  = -fopenmp
 OMPLIB   = -lgomp
 endif
@@ -33,7 +34,7 @@ endif
 ifeq ($(SYSTYPE),"brahan")
 CC = gcc	
 OPTIMIZE = -O3
-CFLAGS   =  $(OPTIMIZE) 
+CFLAGS   =  $(OPTIMIZE) -Wall -fcommon -Wno-unused-result
 OMPINCL  = -fopenmp
 OMPLIB   = -lgomp
 endif
@@ -41,13 +42,13 @@ endif
 ifeq ($(SYSTYPE),"macbook13")
 CC = gcc	
 OPTIMIZE = -O3
-CFLAGS   =  $(OPTIMIZE) 
+CFLAGS   =  $(OPTIMIZE) -Wall
 OMPINCL  = -I/opt/local/include/libomp/ -Xclang -fopenmp
 OMPLIB   = -L/opt/local/lib/libomp/ -lomp
 endif
 
 
-CFLAGS += -Wall $(OPTS) $(OMPINCL)
+CFLAGS += $(OPTS) $(OMPINCL)
 LIBS = -lm $(OMPLIB)
 
 EXEC = LosExtract
@@ -68,7 +69,9 @@ tidy:
 	rm -f $(OBJS) $(EXEC) *~
 	cd ./idl_powerspec/; rm -f *~
 	cd ./idl_readdata/; rm -f *~
+	cd ./idl_utils/; rm -f *~
 	cd ./treecool/; rm -f *~
+
 
 ##############################################################################
 #
@@ -80,10 +83,8 @@ tidy:
 #			density and temperature and saves to an output
 #			file.
 #
-#	- SELF_SHIELD 	Adds a post-processed correction for the
-#			self-shielding of neutral hydrogen. Requires
-#			selection of a UV background file in
-#			parameters.h
+#	- SELF_SHIELD 	Adds a post-processed correction for the self-shielding
+#			of neutral hydrogen. 
 #
 #	- NO_PECVEL 	Computes the spectra ignoring gas peculiar velocities.
 #
@@ -91,19 +92,17 @@ tidy:
 #			Gaussian, following Tepper-Garcia (2006,
 #			MNRAS, 369, 2025).  Slower than the Gaussian
 #			and introduces some shot noise on small scales
-#			in the power spectrum due to precision errors.
-#			This should occur well below observable scales,
-#			but this needs to be verified by the user.
-#			Use with care.
+#			in the power spectrum.  This should be well
+#			below observable scales, but this needs to be
+#			verified by the user.  
 #
 #	- QUICK_GAUSS 	Uses a look-up table for the Gaussian profile.
 #			Faster but slightly less accurate far from the
 #			line centre.  Can introduce some shot noise on
-#			small scales due to precision errors.
+#			small scales.  Use with care.
 #
-#	- TEST_KERNEL 	Test flag.  Runs a model with a constant HI
-#			fraction and temperature, with vpec=0.  Used
-#			to assess if the LOS pixel scale properly
-#			resolves the thermal broadening kernel.
+#	- TEST_KERNEL 	Test option.  Can be used to assess if the LOS pixel
+#			scale properly resolves the thermal broadening
+#			kernel.  
 #
 ##############################################################################

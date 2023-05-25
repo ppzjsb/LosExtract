@@ -1,7 +1,7 @@
 
 /********************************************************************************/
 
-/*! \file extract_los.c 
+/**! \file extract_los.c 
  *
  * \brief Reads in an on-the-fly LOS output and computes the optical depths
  *
@@ -44,7 +44,7 @@ static double dgx_inv;
 
 /********************************************************************************/
 
-/* \brief Calculate the Lyman-alpha optical depths for each sight-line  
+/** \brief Calculate the Lyman-alpha optical depths for each sight-line  
  *
  * \param argc number of command line arguments passed
  * \param argv pointer array to each argument passed
@@ -57,13 +57,6 @@ static double dgx_inv;
 
 int main(int argc, char **argv)
 {
-
-#if defined(TEST_KERNEL) && !defined(NO_PECVEL) 
-  printf("\nTEST_KERNEL also requires NO_PECVEL to be used.\n");
-  printf("Stopping...\n\n");
-  exit(0);
-#endif
-
 
 #ifdef OPENMP
   double start;
@@ -136,7 +129,7 @@ int main(int argc, char **argv)
 
 /********************************************************************************/
 
-/* \brief Calculate the Lyman-alpha optical depths for each sight-line                                                 
+/** \brief Calculate the Lyman-alpha optical depths for each sight-line                                                 
  */
 
 /********************************************************************************/
@@ -197,7 +190,7 @@ void compute_absorption()
 	    rho_wk_H1[convol_index] = self_shield(nHcgs, log10(temp_wk_H1[convol_index]));
 #endif
 
-
+	  
 #ifdef TEST_KERNEL
 	  rho_wk_H1[convol_index]  = 1.0e-5;
 	  temp_wk_H1[convol_index] = 1.0e3;
@@ -310,7 +303,7 @@ void compute_absorption()
 
 /********************************************************************************/
 
-/* \brief Read in the LOS binary file
+/** \brief Read in the LOS binary file
  */
 
 /********************************************************************************/
@@ -325,7 +318,6 @@ void read_los()
   if(!(input=fopen(fname,"rb")))
     {
       printf("can't open file `%s`\n\n",fname);
-      fclose(input);
       exit(0);
     }
   
@@ -376,7 +368,7 @@ void read_los()
 
 /********************************************************************************/
 
-/* \brief Write the optical depths to a binary file
+/** \brief Write the optical depths to a binary file
  */
 
 /********************************************************************************/
@@ -386,7 +378,7 @@ void write_tau()
   char fname[400];
   FILE *output;
    
-  sprintf(fname, "%s/tautest%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  sprintf(fname, "%s/tau%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
  
   if(!(output=fopen(fname,"wb")))
     {
@@ -419,7 +411,7 @@ void write_tau()
 
 /********************************************************************************/
 
-/* \brief Make a look-up table for the Gaussian line profile 
+/** \brief Make a look-up table for the Gaussian line profile 
  */
 
 /********************************************************************************/
@@ -458,7 +450,7 @@ void GaussianProfileTable()
 
 /********************************************************************************/
 
-/* \brief Allocate LOS memory
+/** \brief Allocate LOS memory
  */
 
 /********************************************************************************/
@@ -578,7 +570,7 @@ void allocate_los_memory()
 
 /********************************************************************************/
 
-/* \brief Free LOS memory
+/** \brief Free LOS memory
  */
 
 /********************************************************************************/

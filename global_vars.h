@@ -1,10 +1,17 @@
 
 
+
 double ztime,omegam,omegal,omegab,h100,box100,Xh;
 
 #ifdef SELF_SHIELD
   double n0_z;
 #endif
+
+
+#if defined(TEST_KERNEL) && !defined(NO_PECVEL)
+#error "TEST_KERNEL requires NO_PECVEL"
+#endif
+
 
 /* Numbers */
 #define  PI    3.14159265358979323846

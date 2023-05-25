@@ -6,8 +6,8 @@
 ;;-------------------------------------------------------------------
 
 
-filename1 = base+modval[m_ind]+'los1024_n5000_z'+zval[z_ind]+'.dat'
-filename2 = base+modval[m_ind]+'tautest1024_n5000_z'+zval[z_ind]+'.dat'
+filename1 = base+modval[m_ind]+'los2048_n5000_z'+zval[z_ind]+'.dat'
+filename2 = base+modval[m_ind]+'tau2048_n5000_z'+zval[z_ind]+'.dat'
 
    
 ztime  = 0.0d

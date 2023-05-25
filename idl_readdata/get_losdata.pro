@@ -13,24 +13,23 @@ TAUW_FLAG = 0
 ;; flag for testing the accuracy of the line profile convolution (0 or
 ;; 1).  Fix xH1 and T to constants by hand in LosExtract, and use
 ;; NO_PECVEL.  The GP optical depths should be recovered.
-TEST_KERNEL = 1
+TEST_KERNEL = 0
 
 ;; Select LOS (0 to NUMLOS-1)
-PLOTLOS = 128
+PLOTLOS = 325
 
-base      = '../../planck1_40_32_v3/spectra/'
 
-;;base      = '../../planck1_20_1024/'
+base      = '../../../testruns/planck1_40_512_G3/'
 
 
 ;;-------------------------------------------------------------------
 
 ;;filename1 = base+'spec1024_n5000_z2.000.dat'
-filename1 = base+'los1024_n5000_z2.000.dat'
-filename2 = base+'tautest1024_n5000_z2.000.dat'
+filename1 = base+'los2048_n5000_z5.000.dat'
+filename2 = base+'tau2048_n5000_z5.000.dat'
 
 if TAUW_FLAG eq 1 then  begin
-   filename3 = base+'tauw1024_n5000_z2.000.dat'
+   filename3 = base+'tauw1024_n5000_z4.000.dat'
 endif
 
 @read_los
@@ -41,8 +40,8 @@ ind = where(density gt 1000.0 and temp_H1 lt 1.0e5)
 if(ind(0) ne -1) then begin
    print
    print,'Pixels where Delta > 1000 and log*T/K) < 5:',n_elements(ind)
-  ; print,alog10(temp_H1(ind))
-  ; print,alog10(density(ind))
+   print,alog10(temp_H1(ind))
+   print,alog10(density(ind))
 endif
    
 

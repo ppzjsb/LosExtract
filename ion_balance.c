@@ -1,7 +1,7 @@
 
 /********************************************************************************/
 
-/*! \file ion_balance.c                                                                                
+/**! \file ion_balance.c                                                                                
  *                                                                                                         
  *  \brief Routine for recomputing the HI fraction in pixels that are self-shielded
  */
@@ -38,7 +38,7 @@ static double logTmin, logTmax;
 
 /********************************************************************************/
 
-/* \brief Routine to (re-)compute the neutral hydrogen fraction using
+/** \brief Routine to (re-)compute the neutral hydrogen fraction using
  *  the self-shielding correction of Chardin et al. 2018, MNRAS, 478,
  *  1065 and Rahmati et al. 2013, MNRAS, 430, 2427 
  *
@@ -64,7 +64,7 @@ double self_shield(double nHcgs, double logT)
 }
 /********************************************************************************/
 
-/* \brief This function computes the equilibrium abundance ratios 
+/** \brief This function computes the equilibrium abundance ratios 
  *
  * \param nHcgs The hydrogen number density in cgs units [cm^-3]
  * \param logT  log10 of the gas temperature [K]
@@ -82,12 +82,11 @@ double ion_balance(double nHcgs, double logT)
   double gJHepne = 0.0;
   double yhelium = (1.0 - Xh) / (4.0 * Xh);
 
-  /* Initialised values only */
+  /* Initialised values only.  Note we don't need nHe0 anywhere. */
   double nHp   = 0.0;
   double nHep  = 0.0;
   double nHepp = 0.0;
   double nH0   = 0.0;
-  double nHe0  = 0.0;
   double ne    = 1.0;
   
   if(logT <= logTmin) /* everything neutral */
@@ -150,12 +149,10 @@ double ion_balance(double nHcgs, double logT)
 	{
 	  nHep = 0.0;
 	  nHepp = 0.0;
-	  nHe0 = yhelium;
 	}
       else
 	{
 	  nHep  = yhelium / (1.0 + (aHep+ad) / (geHe0 + gJHe0ne) + (geHep + gJHepne) / aHepp);	
-	  nHe0  = nHep * (aHep+ad) / (geHe0 + gJHe0ne);	
 	  nHepp = nHep * (geHep + gJHepne) / aHepp;	
 	}
       
@@ -194,7 +191,7 @@ double ion_balance(double nHcgs, double logT)
 
 /********************************************************************************/
 
-/* \brief Initialise cooling and ionisation table at start of run
+/** \brief Initialise cooling and ionisation table at start of run
  */
 
 /********************************************************************************/
@@ -218,7 +215,7 @@ void InitCool(void)
 
 /******************************************************************************/
 
-/* \brief Make the look-up table for the collisional ionisation rates
+/** \brief Make the look-up table for the collisional ionisation rates
  * and recombination coefficients
  */
 
@@ -244,8 +241,9 @@ void MakeCoolingTable(void)
   logTmin = log10(TMIN);
   logTmax = log10(TMAX);
   deltaT  = (logTmax - logTmin) / NCOOLTAB;
- 
-  for(int i = 0; i <= NCOOLTAB; i++)
+
+  int i;
+  for(i = 0; i <= NCOOLTAB; i++)
     {
       double T      = pow(10.0, logTmin + deltaT * i);
       double T_eV   = T * BOLTZMANN/ELECTRONVOLT;
@@ -289,7 +287,7 @@ void MakeCoolingTable(void)
 
 /******************************************************************************/
 
-/* \brief Reads in the information from TREECOOL at start of run 
+/** \brief Reads in the information from TREECOOL at start of run 
  */
 
 /******************************************************************************/
@@ -312,18 +310,20 @@ void ReadIonizeParams(char *fname)
       exit(0);
     }
 
-  for(int i = 0; i < TABLESIZE; i++)
+  int i;
+  for(i = 0; i < TABLESIZE; i++)
     gH0[i] = 0;
   
-  for(int i = 0; i < TABLESIZE; i++)
+  for(i = 0; i < TABLESIZE; i++)
     if(fscanf(fdcool, "%g %g %g %g %g %g %g",
 	      &inlogz[i], &gH0[i], &gHe[i], &gHep[i], &eH0[i], &eHe[i], &eHep[i]) == EOF)
       break;
-
+  
   fclose(fdcool);
-
+  
   /*  nheattab is the number of entries in the table */
-  for(int i = 0, nheattab = 0; i < TABLESIZE; i++)
+  nheattab = 0;
+  for(i = 0; i < TABLESIZE; i++)
     if(gH0[i] != 0.0)
       nheattab++;
     else
@@ -333,7 +333,7 @@ void ReadIonizeParams(char *fname)
 
 /******************************************************************************/
 
-/* \brief  Computes the photo-ionisation and photo-heating rates from the
+/** \brief  Computes the photo-ionisation and photo-heating rates from the
  *  external TREECOOL file
  */
 
@@ -345,7 +345,8 @@ void IonizeParamsTable()
   float logz = log10(ztime + 1.0);
   int ilow   = 0;
   
-  for(int i = 0; i < nheattab; i++)
+  int i;
+  for(i = 0; i < nheattab; i++)
     {
       if(inlogz[i] < logz)
 	ilow = i;
@@ -374,7 +375,7 @@ void IonizeParamsTable()
 }
 /******************************************************************************/
 
-/* \brief Performs a linear interpolation to obtain the parameters for
+/** \brief Performs a linear interpolation to obtain the parameters for
  *  the self-shielding correction
  *
  *  The tabulated fits for the self-shielding correction to the HI
@@ -434,7 +435,7 @@ void SelfShieldFit()
 
 /******************************************************************************/
 
-/* \brief  Allocate the arrays for the cooling function table 
+/** \brief  Allocate the arrays for the cooling function table 
  */
 
 /******************************************************************************/
