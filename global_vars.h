@@ -1,5 +1,12 @@
 
+/********************************************************************************/
 
+/**! \file global_vars.h                                                          
+ *                                                
+ *  \brief defines common variables and constants.
+ */
+
+/********************************************************************************/
 
 double ztime,omegam,omegal,omegab,h100,box100,Xh;
 
@@ -31,10 +38,13 @@ double ztime,omegam,omegal,omegab,h100,box100,Xh;
 
 /* Atomic data (from VPFIT) */
 #define  LAMBDA_LYA_H1  1215.6701e-8 /* cm */
+#define  LAMBDA_LYA_HE2 303.7822e-8
 #define  FOSC_LYA       0.416400
+#define  GAMMA_LYA      6.265e8  /* s^-1 */
 #define  HMASS          1.00794  /* Hydrogen mass in a.m.u. */
-#define  GAMMA_LYA_H1   6.265e8  /* s^-1 */
+#define  HEMASS         4.002602 /* Helium-4 mass in a.m.u. */
 
 /* Gaussian profile table */
 #define GXMAX  100.0
 #define NGXTAB 1000000
+

@@ -9,11 +9,14 @@
 
 #--------------------------------------- Compile-time options
 
+
 OPTS +=-DOPENMP
 #OPTS +=-DTAU_WEIGHT
+#OPTS +=-DHE2LYA
 #OPTS +=-DSELF_SHIELD
 #OPTS +=-DNO_PECVEL
 OPTS +=-DVOIGT
+OPTS +=-DREBIN_KERNEL
 #OPTS +=-DQUICK_GAUSS
 #OPTS +=-DTEST_KERNEL
 
@@ -52,7 +55,7 @@ CFLAGS += $(OPTS) $(OMPINCL)
 LIBS = -lm $(OMPLIB)
 
 EXEC = LosExtract
-OBJS = extract_los.o ion_balance.o
+OBJS = extract_los.o ion_balance.o utils.o
 INCL = proto.h global_vars.h
 
 
@@ -83,6 +86,8 @@ tidy:
 #			density and temperature and saves to an output
 #			file.
 #
+#	- HE2LYA	Optionally computes the HeII Lyman-alpha optical depths. 
+#
 #	- SELF_SHIELD 	Adds a post-processed correction for the self-shielding
 #			of neutral hydrogen. 
 #
@@ -94,7 +99,15 @@ tidy:
 #			and introduces some shot noise on small scales
 #			in the power spectrum.  This should be well
 #			below observable scales, but this needs to be
-#			verified by the user.  
+#			verified by the user.
+#
+#	- REBIN _KERNEL Performs a check on the sampling rate of the
+#			thermal broadening kernel.  If the native
+#			resolution of the input files are
+#			undersampling the kernel, this performs a
+#			rebinning using linear interpolation.  It is
+#			strongly recommended this option is always
+#			left on.
 #
 #	- QUICK_GAUSS 	Uses a look-up table for the Gaussian profile.
 #			Faster but slightly less accurate far from the

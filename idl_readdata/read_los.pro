@@ -43,15 +43,23 @@ H1frac   = dblarr(numlos*nbins)
 temp_H1  = dblarr(numlos*nbins)
 vpec_H1  = dblarr(numlos*nbins)
 readu,1,H1frac,temp_H1,vpec_H1
+
+if HE2_FLAG eq 1 then begin
+;; HeII data (HeIII/H, T in K, vpec in km/s)
+   He2frac   = dblarr(numlos*nbins) 
+   temp_He2  = dblarr(numlos*nbins)
+   vpec_He2  = dblarr(numlos*nbins)
+   readu,1,He2frac,temp_He2,vpec_He2
+endif
+
 close,1
+
 
 ;; HI Lya optical depth
 openr,2,filename2
 tau_H1 = dblarr(numlos*nbins)
 readu,2,tau_H1
 close,2
-
-flux = dblarr(numlos*nbins)  
 
 ;; Check for NaNs
 ind = where(finite(tau_H1) eq 0)
@@ -68,5 +76,31 @@ if TAUW_FLAG eq 1 then begin
    readu,3,density_tau,temp_H1_tau
    close,3   
 endif
+
+if HE2_FLAG eq 1 then begin
+   
+;; HeII Lya optical depth
+   openr,4,filename4
+   tau_He2 = dblarr(numlos*nbins)
+   readu,4,tau_He2
+   close,4
+   
+;; Check for NaNs
+   ind = where(finite(tau_He2) eq 0)
+   if(ind(0) ne -1) then begin
+      print,'Bad elements in tau_He2!',n_elements(ind)
+   endif
+   
+;; Optionally read optical depth quantities 
+   if TAUW_FLAG eq 1 then begin
+      openr,5,filename5
+      density_tau_He2 = dblarr(numlos*nbins) 
+      temp_He2_tau    = dblarr(numlos*nbins)
+      readu,5,density_tau_He2,temp_He2_tau
+      close,5   
+   endif
+
+endif
+
 
 ;;-------------------------------------------------------------------

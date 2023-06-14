@@ -36,7 +36,7 @@ static double logTmin, logTmax;
 #define MAXITER  150
 #define NCOOLTAB 2000
 
-/********************************************************************************/
+
 
 /** \brief Routine to (re-)compute the neutral hydrogen fraction using
  *  the self-shielding correction of Chardin et al. 2018, MNRAS, 478,
@@ -47,8 +47,6 @@ static double logTmin, logTmax;
  *
  * \return nH0 The neutral hydrogen fraction, nHI/nH [dimensionless]
  */
-
-/********************************************************************************/
 
 double self_shield(double nHcgs, double logT)
 {
@@ -62,7 +60,8 @@ double self_shield(double nHcgs, double logT)
   
   return nH0; /* HI/H */
 }
-/********************************************************************************/
+
+
 
 /** \brief This function computes the equilibrium abundance ratios 
  *
@@ -71,8 +70,6 @@ double self_shield(double nHcgs, double logT)
  *
  * \return nH0 The neutral hydrogen fraction, nHI/nH [dimensionless]
  */
-
-/********************************************************************************/
 
 double ion_balance(double nHcgs, double logT)
 {
@@ -189,12 +186,9 @@ double ion_balance(double nHcgs, double logT)
   
 }
 
-/********************************************************************************/
 
 /** \brief Initialise cooling and ionisation table at start of run
  */
-
-/********************************************************************************/
 
 void InitCool(void)
 {
@@ -213,13 +207,11 @@ void InitCool(void)
   SelfShieldFit();
 }
 
-/******************************************************************************/
+
 
 /** \brief Make the look-up table for the collisional ionisation rates
  * and recombination coefficients
  */
-
-/******************************************************************************/
 
 void MakeCoolingTable(void)  
 {
@@ -285,12 +277,10 @@ void MakeCoolingTable(void)
   
 }
 
-/******************************************************************************/
+
 
 /** \brief Reads in the information from TREECOOL at start of run 
  */
-
-/******************************************************************************/
 
 #define TABLESIZE 500
 
@@ -331,13 +321,12 @@ void ReadIonizeParams(char *fname)
   
 }
 
-/******************************************************************************/
+
+
 
 /** \brief  Computes the photo-ionisation and photo-heating rates from the
  *  external TREECOOL file
  */
-
-/******************************************************************************/
 
 void IonizeParamsTable()
 {
@@ -373,7 +362,8 @@ void IonizeParamsTable()
   
   return;
 }
-/******************************************************************************/
+
+
 
 /** \brief Performs a linear interpolation to obtain the parameters for
  *  the self-shielding correction
@@ -384,8 +374,6 @@ void IonizeParamsTable()
  *  separated by dz=1.0.  See Table A1 and Eq. A1 in Rahmati et
  *  al. (2013), and Table A1 in Chardin et al. (2017)
  */
-
-/******************************************************************************/
 
 void SelfShieldFit()
 {
@@ -433,72 +421,33 @@ void SelfShieldFit()
   return;
 }
 
-/******************************************************************************/
+
 
 /** \brief  Allocate the arrays for the cooling function table 
  */
 
-/******************************************************************************/
-
 void InitCoolMemory(void)
 {
   AlphaHp = (double *) calloc((NCOOLTAB + 1), sizeof(double));
-  if(NULL==AlphaHp)
-    {
-      free(AlphaHp);
-      printf("Memory allocation failed for AlphaHp.\n");
-      exit(0);
-    }
+  if(NULL==AlphaHp){free(AlphaHp); printf("Memory allocation failed for AlphaHp.\n"); exit(0);}
 
   AlphaHep = (double *) calloc((NCOOLTAB + 1), sizeof(double));
-  if(NULL==AlphaHep)
-    {
-      free(AlphaHep);
-      printf("Memory allocation failed for AlphaHep.\n");
-      exit(0);
-    }
+  if(NULL==AlphaHep){free(AlphaHep); printf("Memory allocation failed for AlphaHep.\n"); exit(0);}
   
   AlphaHepp = (double *) calloc((NCOOLTAB + 1), sizeof(double));
-  if(NULL==AlphaHepp)
-    {
-      free(AlphaHepp);
-      printf("Memory allocation failed for AlphaHepp.\n");
-      exit(0);
-    }
+  if(NULL==AlphaHepp){free(AlphaHepp); printf("Memory allocation failed for AlphaHepp.\n"); exit(0);}
   
   Alphad = (double *) calloc((NCOOLTAB + 1), sizeof(double));
-  if(NULL==Alphad)
-    {
-      free(Alphad);
-      printf("Memory allocation failed for Alphad.\n");
-      exit(0);
-    }
+  if(NULL==Alphad){free(Alphad); printf("Memory allocation failed for Alphad.\n"); exit(0);}
 
   GammaeH0 = (double *) calloc((NCOOLTAB + 1), sizeof(double));
-  if(NULL==GammaeH0)
-    {
-      free(GammaeH0);
-      printf("Memory allocation failed for GammaeH0.\n");
-      exit(0);
-    }
+  if(NULL==GammaeH0){free(GammaeH0); printf("Memory allocation failed for GammaeH0.\n"); exit(0);}
 
   GammaeHe0 = (double *) calloc((NCOOLTAB + 1), sizeof(double));
-  if(NULL==GammaeHe0)
-    {
-      free(GammaeHe0);
-      printf("Memory allocation failed for GammaeHe0.\n");
-      exit(0);
-    }
+  if(NULL==GammaeHe0){free(GammaeHe0); printf("Memory allocation failed for GammaeHe0.\n"); exit(0);}
 
   GammaeHep = (double *) calloc((NCOOLTAB + 1), sizeof(double));
-  if(NULL==GammaeHep)
-    {
-      free(GammaeHep);
-      printf("Memory allocation failed for GammaeHep.\n");
-      exit(0);
-    }
+  if(NULL==GammaeHep){free(GammaeHep); printf("Memory allocation failed for GammaeHep.\n"); exit(0);}
 }
 
 #endif
-
-/******************************************************************************/

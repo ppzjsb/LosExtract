@@ -2,7 +2,7 @@
 /*---------------------- Global parameters ---------------------------*/
 
 /* Files to extract */
-#define NLOSFILES 4    /* Number of LOS files to extract */
+#define NLOSFILES 1    /* Number of LOS files to extract */
 
 #define ZI_LOS    2.0  /* Redshift of first LOS file */
 
@@ -10,7 +10,7 @@
 			  Irrelevant if NLOSFILES=1 */
 
 /* The base of the LOS file name */
-#define LOSBASE "los2048_n5000"
+#define LOSBASE "los256_n5000"
 
 /* The UV background file (should be placed in the /treecool directory) */
 #define UVBFILE "TREECOOL_P19" 

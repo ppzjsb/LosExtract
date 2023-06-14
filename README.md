@@ -7,7 +7,7 @@ James S. Bolton
 ---------------------------------------------------------------
 
 LosExtract can be run on a Gadget-3/4 Sherwood LOS file to extract
-Lyman-alpha optical depths. 
+Lyman-alpha optical depths for HI or HeII.
 
 RUNNING THE CODE:
 
