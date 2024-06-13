@@ -13,6 +13,9 @@ TAUW_FLAG = 0
 ;; Flag for HeII Lyman-alpha (0 or 1)
 HE2_FLAG  = 0
 
+;; Flag for SiII and SiIII absorption (0 or 1)
+SILICON   = 1
+
 ;; Flag for test of line profile convolution (0 or 1).  The GP optical
 ;; depths should be recovered.
 TEST_KERNEL = 0
@@ -20,15 +23,13 @@ TEST_KERNEL = 0
 ;; Select LOS (0 to NUMLOS-1)
 PLOTLOS = 100
 
-;base      = '../../../testruns/planck1_40_512_G3/'
-
-base      = '~/FILES/Current_Projects/Gadget4-IGM/testruns/planck1_40_16/'
+base      = '../../'
 
 ;;-------------------------------------------------------------------
 
 ;;filename1 = base+'spec1024_n5000_z2.000.dat'
-filename1 = base+'los256_n5000_z2.000.dat'
-filename2 = base+'tauH1_x256_n5000_z2.000.dat'
+filename1 = base+'los2048_n5000_z3.000.dat'
+filename2 = base+'tauH1_v2048_n5000_z3.000.dat'
 
 if TAUW_FLAG eq 1 then  begin
    filename3 = base+'tauwH1_x256_n5000_z2.000.dat'
@@ -40,6 +41,13 @@ if HE2_FLAG eq 1 then begin
    if TAUW_FLAG eq 1 then  begin
       filename5 = base+'tauwHe2_x256_n5000_z2.000.dat'
    endif
+endif
+
+if SILICON eq 1 then begin
+   filename6 = base+'tauSi2_1190_v2048_n5000_z3.000.dat'
+   filename7 = base+'tauSi2_1193_v2048_n5000_z3.000.dat'
+   filename8 = base+'tauSi2_1260_v2048_n5000_z3.000.dat'
+   filename9 = base+'tauSi3_1207_v2048_n5000_z3.000.dat'
 endif
    
 @read_los
@@ -120,6 +128,16 @@ if HE2_FLAG eq 1 then begin
          oplot,velaxis,(alog10(temp_He2_tau[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]) - min(alog10(temp_He2_tau[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1])))/max(alog10(temp_He2_tau[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1])- min(alog10(temp_He2_tau[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]))),linestyle=2,color=100
       endif
    endif
+endif
+
+if SILICON eq 1 then begin
+   window,1,xsize=1200,ysize=350,title='SiII and SiIII'
+   Device,Retain=2,true_color=24,decomposed=0
+   !p.font=-1
+   plot,velaxis,tau_Si2_1190[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1],/yl,yrange=[1.0e-7,10.0],xstyle=1,ystyle=1,charsize=1.75,ytitle='Optical depth (SiII, SiIII)',xtitle='Hubble velocity [km/s]'
+   oplot,velaxis,tau_Si2_1193[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1],linestyle=1,color=150
+   oplot,velaxis,tau_Si2_1260[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1],linestyle=2,color=175
+   oplot,velaxis,tau_Si3_1207[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1],linestyle=3,color=200
 endif
 
 

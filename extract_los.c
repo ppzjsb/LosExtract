@@ -28,16 +28,11 @@ double *rho_wk_H, *posaxis, *velaxis;
 double *rho_wk_H1, *vel_wk_H1, *temp_wk_H1, *tau_H1;
 double *rho_wk_H_hires, *velaxis_hires;
 double *rho_wk_H1_hires, *vel_wk_H1_hires, *temp_wk_H1_hires;
+
 #ifdef HE2LYA
 double *rho_wk_He2, *vel_wk_He2, *temp_wk_He2,*tau_He2;
 double *rho_wk_He2_hires, *vel_wk_He2_hires, *temp_wk_He2_hires;
 #endif
-double *xlos, *ylos, *zlos;
-
-double ztime_file;
-
-int *ilos, nbins, nlos;
-int hires;
 
 #ifdef TAU_WEIGHT
 double *rho_tau_H1, *temp_tau_H1;
@@ -45,6 +40,18 @@ double *rho_tau_H1, *temp_tau_H1;
 double *rho_tau_He2, *temp_tau_He2;
 #endif
 #endif
+
+#ifdef SILICON
+double *tau_1190_Si2, *tau_1193_Si2, *tau_1260_Si2, *tau_1207_Si3;
+double *tau_1190_Si2_hires, *tau_1193_Si2_hires, *tau_1260_Si2_hires, *tau_1207_Si3_hires;
+#endif
+
+double *xlos, *ylos, *zlos;
+
+double ztime_file;
+
+int *ilos, nbins, nlos;
+int hires;
 
 #ifdef QUICK_GAUSS
 static double *gauss;
@@ -150,11 +157,16 @@ void compute_absorption()
   double vth_He2 = 1.0e-5 * sqrt(BOLTZMANN * 1.0e4 /(HEMASS * AMU));
   vth = dmin(vth, vth_He2);  
 #endif
+#ifdef SILICON
+  double vth_Si = 1.0e-5 * sqrt(BOLTZMANN * 1.0e4 /(SIMASS * AMU));
+  vth = dmin(vth, vth_Si);
+#endif  
+
   double dvbin = velaxis[1] - velaxis[0];
   if(dvbin > vth)
     {
       printf("\nCurrent pixel size is %f km/s\n",dvbin);
-      printf("The thermal lines widths are likely to be unresolved!\n");
+      printf("Thermal line widths are unresolved!\n");
       hires = ceil(dvbin/vth);
       printf("Increasing sample rate by a factor %d, to nbins=%d\n",hires,hires*nbins);
       printf("New pixel size is %f km/s\n\n",dvbin/(double)hires);
@@ -165,19 +177,7 @@ void compute_absorption()
   hires = 1; 
 #endif
   
-  
-  double u_H1[nbins*hires], b_H1_inv[nbins*hires], b2_H1_inv[nbins*hires], tau_H1_dR[nbins*hires];
-#ifdef TAU_WEIGHT
-  double rho_wk_H_tauw_H1[nbins*hires], temp_wk_H1_tauw[nbins*hires];
-#endif
-  
-#ifdef HE2LYA
-  double u_He2[nbins*hires], b_He2_inv[nbins*hires], b2_He2_inv[nbins*hires], tau_He2_dR[nbins*hires];
-#ifdef TAU_WEIGHT
-  double rho_wk_H_tauw_He2[nbins*hires], temp_wk_He2_tauw[nbins*hires];
-#endif
-#endif
-  
+    
   double atime  = 1.0/(1.0+ztime);
   double rscale = (KPC*atime)/h100;     /* comoving kpc/h to cm */
   double escale = 1.0e10;               /* (km s^-1)^2 to (cm s^-1)^2 */
@@ -188,32 +188,70 @@ void compute_absorption()
   
   double vmax  = box100 * Hz * rscale / MPC; /* box size km s^-1 */
   double vmax2 = 0.5 * vmax;
-  
   double rhoc  = 3.0 * (H0*h100) * (H0*h100) / (8.0 * PI * GRAVITY); /* g cm^-3 */
   double critH = rhoc * omegab * Xh / (atime * atime * atime); /* g cm^-3*/
   
-  double sigma_Lya_H1 = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_LYA_H1 * FOSC_LYA; /* cm^2 */
+  
+  /* HI Lyman-alpha (1216) */
+  double u_H1[nbins*hires], b_H1_inv, b2_H1_inv[nbins*hires], tau_H1_dR[nbins*hires];
+#ifdef TAU_WEIGHT
+  double rho_wk_H_tauw_H1[nbins*hires], temp_wk_H1_tauw[nbins*hires];
+#endif
+  
+  double sigma_Lya_H1 = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_LYA_H1 * FOSC_LYA_H1; /* cm^2 */
   double k1_conv      = 2.0 * BOLTZMANN / (HMASS * AMU);
   double k2_conv      = sigma_Lya_H1 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
-
+  
 #ifdef VOIGT
   double aa_H1[nbins*hires];
-  double k_voigt = GAMMA_LYA * LAMBDA_LYA_H1 / (4.0 * PI * sqrt(PI));  /* cm s^-1 */
+  double k_voigt = GAMMA_LYA_H1 * LAMBDA_LYA_H1 / (4.0 * PI * sqrt(PI));  /* cm s^-1 */
 #endif  
+
   
+  /* HeII Lyman-alpha (304) */
 #ifdef HE2LYA
-  double sigma_Lya_He2 = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_LYA_HE2 * FOSC_LYA; /* cm^2 */
-  double k1_conv_He2   = 2.0 * BOLTZMANN / (HEMASS * AMU);  
-  double k2_conv_He2   = sigma_Lya_He2 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
-#ifdef VOIGT
-  double aa_He2[nbins*hires];
-  double k_voigt_He2 = GAMMA_LYA * LAMBDA_LYA_HE2 / (4.0 * PI * sqrt(PI));  /* cm s^-1 */
-#endif
+  double u_He2[nbins*hires], b_He2_inv, b2_He2_inv[nbins*hires], tau_He2_dR[nbins*hires];
+#ifdef TAU_WEIGHT
+  double rho_wk_H_tauw_He2[nbins*hires], temp_wk_He2_tauw[nbins*hires];
 #endif
 
+  double sigma_Lya_He2 = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_LYA_HE2 * FOSC_LYA_HE2; /* cm^2 */
+  double k1_conv_He2   = 2.0 * BOLTZMANN / (HEMASS * AMU);  
+  double k2_conv_He2   = sigma_Lya_He2 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
+
+#ifdef VOIGT
+  double aa_He2[nbins*hires];
+  double k_voigt_He2 = GAMMA_LYA_HE2 * LAMBDA_LYA_HE2 / (4.0 * PI * sqrt(PI));  /* cm s^-1 */
+#endif
+#endif
+  
+  
+  /* SiII (1190,1193,1260) and SiIII (1207) */
+#ifdef SILICON
+  double b_Si_inv, b2_Si_inv[nbins*hires];
+  double tau_1190_Si2_dR[nbins*hires], tau_1193_Si2_dR[nbins*hires];
+  double tau_1260_Si2_dR[nbins*hires], tau_1207_Si3_dR[nbins*hires];
+
+  /* These fractions should be treated as a free parameter; the
+     optical depth is proportional to these. */
+  double Si2frac = 0.1; 
+  double Si3frac = 0.1;
+  
+  double sigma_1190_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1190_Si2 * FOSC_1190_Si2;
+  double sigma_1193_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1193_Si2 * FOSC_1193_Si2;
+  double sigma_1260_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1260_Si2 * FOSC_1260_Si2;
+  double sigma_1207_Si3   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1207_Si3 * FOSC_1207_Si3;
+  
+  double k1_conv_Si       = 2.0 * BOLTZMANN / (SIMASS * AMU);
+  
+  double k2_conv_1190_Si2 = sigma_1190_Si2 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
+  double k2_conv_1193_Si2 = sigma_1193_Si2 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
+  double k2_conv_1260_Si2 = sigma_1260_Si2 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
+  double k2_conv_1207_Si3 = sigma_1207_Si3 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
+#endif
+  
   double pccount = 0.0;
-  
-  
+
   allocate_los_hires_memory();
   resample_los(vmax);
 
@@ -232,13 +270,10 @@ void compute_absorption()
   	{
   	  long long convol_index =  iconv + nbins*hires*ilos;
 	  
-#ifdef SELF_SHIELD
-	  
+#ifdef SELF_SHIELD	  
 	  double nHcgs = critH * rho_wk_H_hires[convol_index] / (HMASS * AMU); /* cm^-3 */
-	  
 	  if (nHcgs >= n0_z)
 	    rho_wk_H1_hires[convol_index] = self_shield(nHcgs, log10(temp_wk_H1_hires[convol_index]));
-
 #endif
 
 	  
@@ -258,12 +293,12 @@ void compute_absorption()
 	  u_H1[iconv] = velaxis_hires[iconv] + vel_wk_H1_hires[convol_index]; /* km s^-1 */
 #endif
 	  
-  	  b_H1_inv[iconv]  = 1.0 / sqrt(k1_conv * temp_wk_H1_hires[convol_index]); /* (cm s^-1)^-1 */
-	  b2_H1_inv[iconv] = escale * b_H1_inv[iconv] * b_H1_inv[iconv];  /* (km s^-1)^-2 */
-	  tau_H1_dR[iconv] = k2_conv * rho_wk_H_hires[convol_index] * rho_wk_H1_hires[convol_index] * b_H1_inv[iconv];
+  	  b_H1_inv         = 1.0 / sqrt(k1_conv * temp_wk_H1_hires[convol_index]); /* (cm s^-1)^-1 */
+	  b2_H1_inv[iconv] = escale * b_H1_inv * b_H1_inv;  /* (km s^-1)^-2 */
+	  tau_H1_dR[iconv] = k2_conv * rho_wk_H_hires[convol_index] * rho_wk_H1_hires[convol_index] * b_H1_inv;
 	  
 #ifdef VOIGT
-	  aa_H1[iconv] = k_voigt * b_H1_inv[iconv];
+	  aa_H1[iconv] = k_voigt * b_H1_inv;
 #endif	  
 	  
 #ifdef TAU_WEIGHT
@@ -271,8 +306,7 @@ void compute_absorption()
 	  temp_wk_H1_tauw[iconv]  = temp_wk_H1_hires[convol_index];
 #endif
 	  
-	  
-	  
+	  	  
 #ifdef HE2LYA	  
 #ifdef NO_PECVEL
   	  u_He2[iconv] = velaxis_hires[iconv]; 
@@ -280,12 +314,12 @@ void compute_absorption()
 	  u_He2[iconv] = velaxis_hires[iconv] + vel_wk_He2_hires[convol_index]; /* km s^-1 */
 #endif
 	  
-  	  b_He2_inv[iconv]  = 1.0 / sqrt(k1_conv_He2 * temp_wk_He2_hires[convol_index]); /* (cm s^-1)^-1 */
-	  b2_He2_inv[iconv] = escale * b_He2_inv[iconv] * b_He2_inv[iconv];  /* (km s^-1)^-2 */
-	  tau_He2_dR[iconv] = k2_conv_He2 * rho_wk_H_hires[convol_index] * rho_wk_He2_hires[convol_index] * b_He2_inv[iconv];
+  	  b_He2_inv         = 1.0 / sqrt(k1_conv_He2 * temp_wk_He2_hires[convol_index]); /* (cm s^-1)^-1 */
+	  b2_He2_inv[iconv] = escale * b_He2_inv * b_He2_inv;  /* (km s^-1)^-2 */
+	  tau_He2_dR[iconv] = k2_conv_He2 * rho_wk_H_hires[convol_index] * rho_wk_He2_hires[convol_index] * b_He2_inv;
 	  
 #ifdef VOIGT
-	  aa_He2[iconv] = k_voigt_He2 * b_He2_inv[iconv];
+	  aa_He2[iconv] = k_voigt_He2 * b_He2_inv;
 #endif	  
 
 #ifdef TAU_WEIGHT
@@ -293,6 +327,40 @@ void compute_absorption()
 	  temp_wk_He2_tauw[iconv]  = temp_wk_He2_hires[convol_index];
 #endif
 #endif
+	  
+	  
+#ifdef SILICON
+	  /* Here we use the HI weighted temperature and peculiar
+	     velocity, but for a hydro simulation that
+	     self-consistently includes metals we may rather use the
+	     appropriate ion weighted quantity.  To compute relative
+	     metallicities (relative to hydrogen by number) we use the
+	     standard metallicity definition:
+	     
+	     [X/Y] = log(X/Y)_obs - log(X/Y)_sol 
+	     
+	     so CIV/H = CIV/C * 10^[C/H] * (C/H)_sol or
+	     HeII/H = (HeII/He) * (yhelium/(He/H)_sol) * (He/H)_sol 
+	     
+	     For [C/H], we use Schaye et al. 2003, ApJ, 596, 768, eq. (8)
+	     and to get [Si/H] we use [Si/C]=0.77 in Table 2 of Aguirre
+	     et al. 2004, ApJ, 602, 38.  Hence [Si/H] = [Si/C] + [C/H] */  
+	  
+	  double ZSi_rel   = pow(10.0, -2.70 + 0.08 * (ztime - 3.0) + 0.65*(log10(rho_wk_H_hires[convol_index]) - 0.5));
+	  double Si2_Hfrac = Si2frac * ZSi_rel * SI_SOLAR; /* SiII/H */
+	  double Si3_Hfrac = Si3frac * ZSi_rel * SI_SOLAR; /* SiIII/H */
+	  
+	  b_Si_inv         = 1.0 / sqrt(k1_conv_Si * temp_wk_H1_hires[convol_index]); /* (cm s^-1)^-1 */
+	  b2_Si_inv[iconv] = escale * b_Si_inv * b_Si_inv;  /* (km s^-1)^-2 */
+	  
+	  double rhoH_bSi_inv    = rho_wk_H_hires[convol_index] * b_Si_inv;
+	  
+	  tau_1190_Si2_dR[iconv] = k2_conv_1190_Si2 * rhoH_bSi_inv * Si2_Hfrac;
+	  tau_1193_Si2_dR[iconv] = (k2_conv_1193_Si2 / k2_conv_1190_Si2) * tau_1190_Si2_dR[iconv];
+	  tau_1260_Si2_dR[iconv] = (k2_conv_1260_Si2 / k2_conv_1190_Si2) * tau_1190_Si2_dR[iconv]; 
+	  tau_1207_Si3_dR[iconv] = k2_conv_1207_Si3 * rhoH_bSi_inv * Si3_Hfrac;
+#endif	  
+	  
 	  
 	}
       
@@ -316,44 +384,76 @@ void compute_absorption()
 #endif
 #endif
 	  
+#ifdef SILICON 
+	  double tau_1190_Si2_sum = 0.0;
+	  double tau_1193_Si2_sum = 0.0;
+	  double tau_1260_Si2_sum = 0.0;
+	  double tau_1207_Si3_sum = 0.0;
+#endif
+	  
 	  int iconv = 0;
+
+
 	  
 #ifdef OPENMP
 #ifdef TAU_WEIGHT
 	  
-#ifdef HE2LYA
+#if defined(HE2LYA) && defined(SILICON)
+#pragma omp parallel for reduction(+:tau_H1_sum, rho_tau_H1_sum, temp_tau_H1_sum, tau_He2_sum, rho_tau_He2_sum, temp_tau_He2_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum)
+#endif
+	 	  
+#if defined(HE2LYA) && !defined(SILICON)
 #pragma omp parallel for reduction(+:tau_H1_sum, rho_tau_H1_sum, temp_tau_H1_sum, tau_He2_sum, rho_tau_He2_sum, temp_tau_He2_sum)
-#else
+#endif
+	 	  
+#if !defined(HE2LYA) && defined(SILICON)
+#pragma omp parallel for reduction(+:tau_H1_sum, rho_tau_H1_sum, temp_tau_H1_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum)
+#endif
+
+#if !defined(HE2LYA) && !defined(SILICON)	  
 #pragma omp parallel for reduction(+:tau_H1_sum, rho_tau_H1_sum, temp_tau_H1_sum)	  
 #endif
 	  
 #else
-	  
-#ifdef HE2LYA
+
+#if defined(HE2LYA) && defined(SILICON)
+#pragma omp parallel for reduction(+:tau_H1_sum, tau_He2_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum)
+#endif
+	 	  
+#if defined(HE2LYA) && !defined(SILICON)
 #pragma omp parallel for reduction(+:tau_H1_sum, tau_He2_sum)
-#else
-#pragma omp parallel for reduction(+:tau_H1_sum)
 #endif
 	  
-#endif	  
+#if !defined(HE2LYA) && defined(SILICON)
+#pragma omp parallel for reduction(+:tau_H1_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum)
 #endif
+	  
+#if !defined(HE2LYA) && !defined(SILICON)	  
+#pragma omp parallel for reduction(+:tau_H1_sum)	  
+#endif	  
+
+#endif
+#endif
+
+	  
 	  for(iconv=0; iconv<nbins*hires; iconv++)
   	    {
 	      
 	      double vdiff_H1 = fabs(velaxis_hires[ipix] - u_H1[iconv]);
+
 	      if (vdiff_H1 > vmax2) vdiff_H1 = vmax - vdiff_H1;
 	      
-  	      double VH1_0  = vdiff_H1 * vdiff_H1 * b2_H1_inv[iconv]; 
+  	      double VH1_0 = vdiff_H1 * vdiff_H1 * b2_H1_inv[iconv]; 
 	      
 #ifdef QUICK_GAUSS
-	      double t    = VH1_0 * dgx_inv;
-	      int tint    = (int)t;
-	      double fhi  = t - tint;
-	      double flow = 1 - fhi;
+	      double t     = VH1_0 * dgx_inv;
+	      int tint          = (int)t;
+	      double fhi   = t - tint;
+	      double flow  = 1 - fhi;
 	      
-	      double VH1_1  = VH1_0 < GXMAX ? flow*gauss[tint]+fhi*gauss[tint+1] : 0.0;
+	      double VH1_1 = VH1_0 < GXMAX ? flow*gauss[tint]+fhi*gauss[tint+1] : 0.0;
 #else
-	      double VH1_1  = exp(-VH1_0);
+	      double VH1_1 = exp(-VH1_0);
 #endif
 	      
 #ifdef VOIGT
@@ -378,21 +478,25 @@ void compute_absorption()
 	      temp_tau_H1_sum += temp_wk_H1_tauw[iconv] * tau_H1_dR[iconv] * profile_H1;
 #endif
 
+
+	      
+	      /* Optionally compute HeII Lyman-alpha absorption */
 #ifdef HE2LYA	      
 	      double vdiff_He2 = fabs(velaxis_hires[ipix] - u_He2[iconv]);
+	      
 	      if (vdiff_He2 > vmax2) vdiff_He2 = vmax - vdiff_He2;
 	      
   	      double VHe2_0  = vdiff_He2 * vdiff_He2 * b2_He2_inv[iconv]; 
 	      
 #ifdef QUICK_GAUSS
-	      double t    = VHe2_0 * dgx_inv;
-	      int tint    = (int)t;
-	      double fhi  = t - tint;
-	      double flow = 1 - fhi;
+	      double t_He2    = VHe2_0 * dgx_inv;
+	      int tint_He2    = (int)t_He2;
+	      double fhi_He2  = t_He2 - tint_He2;
+	      double flow_He2 = 1 - fhi_He2;
 	      
-	      double VHe2_1  = VHe2_0 < GXMAX ? flow*gauss[tint]+fhi*gauss[tint+1] : 0.0;
+	      double VHe2_1   = VHe2_0 < GXMAX ? flow_He2*gauss[tint_He2]+fhi_He2*gauss[tint_He2+1] : 0.0;
 #else
-	      double VHe2_1  = exp(-VHe2_0);
+	      double VHe2_1   = exp(-VHe2_0);
 #endif
 	      
 #ifdef VOIGT
@@ -412,6 +516,29 @@ void compute_absorption()
 #endif
 #endif
 
+	      
+
+	      /* Optionally compute SiII and SiIII absorption */
+#ifdef SILICON 
+	      double VSi_0  = vdiff_H1 * vdiff_H1 * b2_Si_inv[iconv]; 
+	      
+#ifdef QUICK_GAUSS
+	      double t_Si    = VSi_0 * dgx_inv;
+	      int tint_Si    = (int)t_Si;
+	      double fhi_Si  = t_Si - tint_Si;
+	      double flow_Si = 1 - fhi_Si;
+	      
+	      double VSi_1  = VSi_0 < GXMAX ? flow_Si*gauss[tint_Si]+fhi_Si*gauss[tint_Si+1] : 0.0;
+#else
+	      double VSi_1  = exp(-VSi_0);
+#endif
+	      
+	      tau_1190_Si2_sum += tau_1190_Si2_dR[iconv] * VSi_1;
+	      tau_1193_Si2_sum += tau_1193_Si2_dR[iconv] * VSi_1;
+	      tau_1260_Si2_sum += tau_1260_Si2_dR[iconv] * VSi_1;
+	      tau_1207_Si3_sum += tau_1207_Si3_dR[iconv] * VSi_1;
+#endif 
+	      
 	    }
 
 	  if(pixel_index % hires == 0)
@@ -433,6 +560,14 @@ void compute_absorption()
 	      temp_tau_He2[base_index] = temp_tau_He2_sum / tau_He2[base_index];
 #endif  
 #endif
+
+#ifdef SILICON 
+	      tau_1190_Si2[base_index] = tau_1190_Si2_sum;
+	      tau_1193_Si2[base_index] = tau_1193_Si2_sum;
+	      tau_1260_Si2[base_index] = tau_1260_Si2_sum;
+	      tau_1207_Si3[base_index] = tau_1207_Si3_sum;
+#endif
+	      
 	    }
 	  
   	}
@@ -451,7 +586,7 @@ void compute_absorption()
 
 
 /** \brief Resamples the line of sight data if the thermal broadening
- *  kernel is judged to be under-resolved at the native resolution.
+ *   kernel is judged to be under-resolved at the native resolution.
  *   Requires the RESAMPLE_KERNEL flag to do anything, otherwise it
  *   just defaults to the native sample rate.
  *   
@@ -621,7 +756,7 @@ void write_tau()
   char fname[400];
   FILE *output;
    
-  sprintf(fname, "%s/tauH1_x%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  sprintf(fname, "%s/tauH1_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
  
   if(!(output=fopen(fname,"wb")))
     {
@@ -637,7 +772,7 @@ void write_tau()
   
   
 #ifdef TAU_WEIGHT
-  sprintf(fname, "%s/tauwH1_x%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  sprintf(fname, "%s/tauwH1_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
   if(!(output=fopen(fname,"wb")))
     {
       printf("can't open file `%s`\n\n",fname);
@@ -650,7 +785,7 @@ void write_tau()
 
   
 #ifdef HE2LYA  
-  sprintf(fname, "%s/tauHe2_x%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  sprintf(fname, "%s/tauHe2_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
   if(!(output=fopen(fname,"wb")))
     {
       printf("can't open file `%s`\n\n",fname);
@@ -661,7 +796,7 @@ void write_tau()
 
   
 #ifdef TAU_WEIGHT
-  sprintf(fname, "%s/tauwHe2_x%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  sprintf(fname, "%s/tauwHe2_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
   if(!(output=fopen(fname,"wb")))
     {
       printf("can't open file `%s`\n\n",fname);
@@ -673,7 +808,45 @@ void write_tau()
 #endif
   
 #endif
+
   
+#ifdef SILICON 
+  sprintf(fname, "%s/tauSi2_1190_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  if(!(output=fopen(fname,"wb")))
+    {
+      printf("can't open file `%s`\n\n",fname);
+      exit(0);
+    }
+  fwrite(tau_1190_Si2,sizeof(double),nbins*nlos,output);
+  fclose(output);
+
+  sprintf(fname, "%s/tauSi2_1193_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  if(!(output=fopen(fname,"wb")))
+    {
+      printf("can't open file `%s`\n\n",fname);
+      exit(0);
+    }
+  fwrite(tau_1193_Si2,sizeof(double),nbins*nlos,output);
+  fclose(output);
+
+  sprintf(fname, "%s/tauSi2_1260_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  if(!(output=fopen(fname,"wb")))
+    {
+      printf("can't open file `%s`\n\n",fname);
+      exit(0);
+    }
+  fwrite(tau_1260_Si2,sizeof(double),nbins*nlos,output);
+  fclose(output);
+  
+  sprintf(fname, "%s/tauSi3_1207_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  if(!(output=fopen(fname,"wb")))
+    {
+      printf("can't open file `%s`\n\n",fname);
+      exit(0);
+    }
+  fwrite(tau_1207_Si3,sizeof(double),nbins*nlos,output);
+  fclose(output);
+#endif
 
 }
 
@@ -781,6 +954,22 @@ void allocate_los_memory()
 #endif
 #endif
 
+
+#ifdef SILICON 
+  tau_1190_Si2 = (double *)calloc(nlos*nbins, sizeof(double));
+  if(NULL==tau_1190_Si2){free(tau_1190_Si2); printf("Memory allocation failed.\n"); exit(0);}
+  
+  tau_1193_Si2 = (double *)calloc(nlos*nbins, sizeof(double));
+  if(NULL==tau_1193_Si2){free(tau_1193_Si2); printf("Memory allocation failed.\n"); exit(0);}
+  
+  tau_1260_Si2 = (double *)calloc(nlos*nbins, sizeof(double));
+  if(NULL==tau_1260_Si2){free(tau_1260_Si2); printf("Memory allocation failed.\n"); exit(0);}
+  
+  tau_1207_Si3 = (double *)calloc(nlos*nbins, sizeof(double));
+  if(NULL==tau_1207_Si3){free(tau_1207_Si3); printf("Memory allocation failed.\n"); exit(0);}
+#endif
+  
+  
 }
 
 
@@ -821,6 +1010,14 @@ void free_los_memory()
   free(temp_tau_He2);
 #endif
 #endif
+
+#ifdef SILICON 
+  free(tau_1190_Si2);
+  free(tau_1193_Si2);
+  free(tau_1260_Si2);
+  free(tau_1207_Si3);
+#endif
+  
 }
 
 
@@ -879,6 +1076,7 @@ void free_los_hires_memory()
   free(vel_wk_He2_hires);
   free(temp_wk_He2_hires);
 #endif
+
 }
 
 

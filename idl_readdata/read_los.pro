@@ -103,4 +103,27 @@ if HE2_FLAG eq 1 then begin
 endif
 
 
+if SILICON eq 1 then begin
+   openr,6,filename6
+   tau_Si2_1190 = dblarr(numlos*nbins)
+   readu,6,tau_Si2_1190
+   close,6
+   
+   openr,7,filename7
+   tau_Si2_1193 = dblarr(numlos*nbins)
+   readu,7,tau_Si2_1193
+   close,7
+   
+   openr,8,filename8
+   tau_Si2_1260 = dblarr(numlos*nbins)
+   readu,8,tau_Si2_1260
+   close,8
+   
+   openr,9,filename9
+   tau_Si3_1207 = dblarr(numlos*nbins)
+   readu,9,tau_Si3_1207
+   close,9
+endif
+
+
 ;;-------------------------------------------------------------------

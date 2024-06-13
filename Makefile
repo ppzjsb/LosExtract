@@ -13,6 +13,7 @@
 OPTS +=-DOPENMP
 #OPTS +=-DTAU_WEIGHT
 #OPTS +=-DHE2LYA
+OPTS +=-DSILICON
 #OPTS +=-DSELF_SHIELD
 #OPTS +=-DNO_PECVEL
 OPTS +=-DVOIGT
@@ -21,9 +22,9 @@ OPTS +=-DREBIN_KERNEL
 #OPTS +=-DTEST_KERNEL
 
 #--------------------------------------- Select system
-#SYSTYPE="pppzjsb02"
+SYSTYPE="pppzjsb02"
 #SYSTYPE="brahan"
-SYSTYPE="macbook13"
+#SYSTYPE="macbook13"
 
 
 ifeq ($(SYSTYPE),"pppzjsb02")
@@ -82,19 +83,22 @@ tidy:
 #
 #	- OPENMP	Use OpenMP.  Requires library installation
 #
-#	- TAUWEIGHT 	Computes the HI Lyman-alpha optical depth weighted
+#	- TAUWEIGHT 	Computes the Lyman-alpha optical depth weighted
 #			density and temperature and saves to an output
 #			file.
 #
 #	- HE2LYA	Optionally computes the HeII Lyman-alpha optical depths. 
+#
+#	- SILICON	Optionally computes SiII (1190, 1193, 1260) and SiIII (1207)
+#			optical depths.  Always uses a Gaussian profile.
 #
 #	- SELF_SHIELD 	Adds a post-processed correction for the self-shielding
 #			of neutral hydrogen. 
 #
 #	- NO_PECVEL 	Computes the spectra ignoring gas peculiar velocities.
 #
-#	- VOIGT 	Computes the spectra with a Voigt profile instead of a
-#			Gaussian, following Tepper-Garcia (2006,
+#	- VOIGT 	Computes the Lyman-alpha spectra with a Voigt profile
+# 			instead of a Gaussian, following Tepper-Garcia (2006,
 #			MNRAS, 369, 2025).  Slower than the Gaussian
 #			and introduces some shot noise on small scales
 #			in the power spectrum.  This should be well
@@ -106,12 +110,13 @@ tidy:
 #			resolution of the input files are
 #			undersampling the kernel, this performs a
 #			rebinning using linear interpolation.  It is
-#			strongly recommended this option is always
+#			*strongly recommended* this option is always
 #			left on.
 #
-#	- QUICK_GAUSS 	Uses a look-up table for the Gaussian profile.
-#			Faster but slightly less accurate far from the
-#			line centre.  Can introduce some shot noise on
+#	- QUICK_GAUSS   Uses a look-up table for the Gaussian profile.
+#			Faster and so useful for a quick check, but
+#			slightly less accurate far from the line
+#			centre.  Can introduce some shot noise on
 #			small scales.  Use with care.
 #
 #	- TEST_KERNEL 	Test option.  Can be used to assess if the LOS pixel

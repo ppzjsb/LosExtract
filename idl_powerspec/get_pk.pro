@@ -14,13 +14,15 @@ CONVOLVE  = 0  ;; optionally convolve with Gaussian with FWHM=7km/s
 REBIN     = 0  ;; optionally rebin/rsample P(k) to be equally spaced log10(k)
 
 ;; Location of input files
-base = '../../../testruns/'
+base = '../../'
 
 ;; Select models
-modval  = ['planck1_40_512_G3/']
+;;modval  = ['planck1_40_512_G3/']
+modval  = ['']
 
 ;; Select redshifts
-zval    = ['2.000','3.000','4.000','5.000']
+;;zval    = ['2.000','3.000','4.000','5.000']
+zval    = ['3.000']
 
 ;; Set range for rebinning here
 kmin    = -2.9d
@@ -126,14 +128,14 @@ device,retain=2
 
 if(REBIN eq 1) then begin
    plot,logk_bin,alog10(flux_pk_bin[0,0,*]),linestyle=0,xrange=[-3.5,0.5],xstyle=1,yrange=[-20,1],ystyle=1,xtitle='log(k/s/km)',ytitle=' log(kP(k)/pi)',charsize=1.75
-   oplot,logk_bin,alog10(flux_pk_bin[0,1,*]),linestyle=1
-   oplot,logk_bin,alog10(flux_pk_bin[0,2,*]),linestyle=2
-   oplot,logk_bin,alog10(flux_pk_bin[0,3,*]),linestyle=3
+;   oplot,logk_bin,alog10(flux_pk_bin[0,1,*]),linestyle=1
+;   oplot,logk_bin,alog10(flux_pk_bin[0,2,*]),linestyle=2
+;   oplot,logk_bin,alog10(flux_pk_bin[0,3,*]),linestyle=3
 endif else begin
    plot,alog10(k),alog10(flux_pk[0,0,*]),linestyle=0,xrange=[-3.5,0.5],xstyle=1,yrange=[-20,1],ystyle=1,xtitle='log(k/s/km)',ytitle=' log(kP(k)/pi)',charsize=1.75
-   oplot,alog10(k),alog10(flux_pk[0,1,*]),linestyle=1
-   oplot,alog10(k),alog10(flux_pk[0,2,*]),linestyle=2
-   oplot,alog10(k),alog10(flux_pk[0,3,*]),linestyle=3
+ ;  oplot,alog10(k),alog10(flux_pk[0,1,*]),linestyle=1
+ ;  oplot,alog10(k),alog10(flux_pk[0,2,*]),linestyle=2
+ ;  oplot,alog10(k),alog10(flux_pk[0,3,*]),linestyle=3
 endelse
 
 ;;-------------------------------------------------------------------
