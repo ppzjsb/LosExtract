@@ -45,7 +45,7 @@ double ztime,omegam,omegal,omegab,h100,box100,Xh;
 #define  GAMMA_LYA_H1   6.265e8  /* s^-1 */
 
 /* Helium */
-#define  HEMASS         4.002602 /* Helium-4 mass in a.m.u. */
+#define  HEMASS         4.002602 /* Helium-4 atomic weight in a.m.u. */
 #define  LAMBDA_LYA_HE2 303.7822e-8
 #define  FOSC_LYA_HE2   0.416400
 #define  GAMMA_LYA_HE2  6.265e8  /* s^-1 */
