@@ -39,19 +39,19 @@ double ztime,omegam,omegal,omegab,h100,box100,Xh;
    https://ciaaw.org/index.htm */
 
 /* Hydrogen */
-#define  HMASS          1.0078250322  /* Hydrogen atomic mass in a.m.u. */
+#define  HMASS          1.00794  /* Hydrogen atomic weight in a.m.u. */
 #define  LAMBDA_LYA_H1  1215.6701e-8 /* cm */
 #define  FOSC_LYA_H1    0.416400
 #define  GAMMA_LYA_H1   6.265e8  /* s^-1 */
 
 /* Helium */
-#define  HEMASS         4.0026032545 /* Helium-4 mass in a.m.u. */
+#define  HEMASS         4.002602 /* Helium-4 mass in a.m.u. */
 #define  LAMBDA_LYA_HE2 303.7822e-8
 #define  FOSC_LYA_HE2   0.416400
 #define  GAMMA_LYA_HE2  6.265e8  /* s^-1 */
 
 /* Silicon */
-#define  SIMASS          27.976926535  /* Silicon-28 mass in a.m.u */
+#define  SIMASS          28.085  /* Silicon atomic weight in a.m.u */
 #define  SI_SOLAR        3.236e-5  /* Asplund et al (2009), Table 1,  10^(7.60-12) */
 #define  LAMBDA_1190_Si2 1190.4158e-8
 #define  FOSC_1190_Si2   0.2920
