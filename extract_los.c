@@ -1,3 +1,4 @@
+
 /********************************************************************************/
 
 /**! \file extract_los.c 
@@ -96,6 +97,10 @@ int main(int argc, char **argv)
 
 #ifdef QUICK_GAUSS  
   GaussianProfileTable();
+#endif
+
+#ifdef SILICON
+  InitCloudy();
 #endif
 
 #ifdef OPENMP  
@@ -231,12 +236,9 @@ void compute_absorption()
   double b_Si_inv, b2_Si_inv[nbins*hires];
   double tau_1190_Si2_dR[nbins*hires], tau_1193_Si2_dR[nbins*hires];
   double tau_1260_Si2_dR[nbins*hires], tau_1207_Si3_dR[nbins*hires];
-
-  /* These fractions should be treated as a free parameter; the
-     optical depth is proportional to these. */
-  double Si2frac = 0.1; 
-  double Si3frac = 0.1;
   
+  double Si2frac, Si3frac;
+
   double sigma_1190_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1190_Si2 * FOSC_1190_Si2;
   double sigma_1193_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1193_Si2 * FOSC_1193_Si2;
   double sigma_1260_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1260_Si2 * FOSC_1260_Si2;
@@ -337,16 +339,24 @@ void compute_absorption()
 	     metallicities (relative to hydrogen by number) we use the
 	     standard metallicity definition:
 	     
-	     [X/Y] = log(X/Y)_obs - log(X/Y)_sol 
+	     [X/Y] = log10(X/Y)_obs - log10(X/Y)_sol 
 	     
 	     so CIV/H = CIV/C * 10^[C/H] * (C/H)_sol or
-	     HeII/H = (HeII/He) * (yhelium/(He/H)_sol) * (He/H)_sol 
+	     HeII/H = (HeII/He) * (yhelium/(He/H)_sol) * (He/H)_sol */
 	     
-	     For [C/H], we use Schaye et al. 2003, ApJ, 596, 768, eq. (8)
+#ifdef SILICON_POD
+	  /* For [C/H], we use Schaye et al. 2003, ApJ, 596, 768, eq. (8)
 	     and to get [Si/H] we use [Si/C]=0.77 in Table 2 of Aguirre
 	     et al. 2004, ApJ, 602, 38.  Hence [Si/H] = [Si/C] + [C/H] */  
+	  double ZSi_rel = pow(10.0, -2.70 + 0.08 * (ztime - 3.0) + 0.65*(log10(rho_wk_H_hires[convol_index]) - 0.5)); /* 10^[Si/H] */
+#else
+	  double ZSi_rel = pow(10.0, Z_SI);
+#endif
+	  double logT  = log10(temp_wk_H1_hires[convol_index]); /* K */
+	  double lognH = log10(critH * rho_wk_H_hires[convol_index] / (HMASS * AMU)); /* cm^-3 */
 	  
-	  double ZSi_rel   = pow(10.0, -2.70 + 0.08 * (ztime - 3.0) + 0.65*(log10(rho_wk_H_hires[convol_index]) - 0.5));
+	  get_ionfrac(logT, lognH, &Si2frac, &Si3frac); /* get cloudy table values */
+	  
 	  double Si2_Hfrac = Si2frac * ZSi_rel * SI_SOLAR; /* SiII/H */
 	  double Si3_Hfrac = Si3frac * ZSi_rel * SI_SOLAR; /* SiIII/H */
 	  
@@ -360,8 +370,6 @@ void compute_absorption()
 	  tau_1260_Si2_dR[iconv] = (k2_conv_1260_Si2 / k2_conv_1190_Si2) * tau_1190_Si2_dR[iconv]; 
 	  tau_1207_Si3_dR[iconv] = k2_conv_1207_Si3 * rhoH_bSi_inv * Si3_Hfrac;
 #endif	  
-	  
-	  
 	}
       
       int ipix = 0;
@@ -434,7 +442,6 @@ void compute_absorption()
 
 #endif
 #endif
-
 	  
 	  for(iconv=0; iconv<nbins*hires; iconv++)
   	    {
@@ -447,7 +454,7 @@ void compute_absorption()
 	      
 #ifdef QUICK_GAUSS
 	      double t     = VH1_0 * dgx_inv;
-	      int tint          = (int)t;
+	      int tint     = (int)t;
 	      double fhi   = t - tint;
 	      double flow  = 1 - fhi;
 	      

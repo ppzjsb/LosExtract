@@ -1,7 +1,7 @@
 
 #########################################################################
 #									#
-#  LosExtract can be run on a Gadget-3/4  LOS file to extract		#
+#  LosExtract can be run on a Gadget-3/4 LOS file to extract		#
 #  Lyman-alpha forest absorption spectra.  Look at end of file for a	#
 #  brief guide to the compile-time options. 				#
 #									#
@@ -14,6 +14,7 @@ OPTS +=-DOPENMP
 #OPTS +=-DTAU_WEIGHT
 #OPTS +=-DHE2LYA
 OPTS +=-DSILICON
+OPTS +=-DSILICON_POD
 #OPTS +=-DSELF_SHIELD
 #OPTS +=-DNO_PECVEL
 OPTS +=-DVOIGT
@@ -56,7 +57,7 @@ CFLAGS += $(OPTS) $(OMPINCL)
 LIBS = -lm $(OMPLIB)
 
 EXEC = LosExtract
-OBJS = extract_los.o ion_balance.o utils.o
+OBJS = extract_los.o ion_balance.o utils.o cloudy_tables.o
 INCL = proto.h global_vars.h
 
 
@@ -74,8 +75,8 @@ tidy:
 	cd ./idl_powerspec/; rm -f *~
 	cd ./idl_readdata/; rm -f *~
 	cd ./idl_utils/; rm -f *~
-	cd ./treecool/; rm -f *~
-
+	cd ./treecool/; rm -f *~ 
+	cd ./cloudy_tables/; rm -f *~
 
 ##############################################################################
 #
@@ -90,17 +91,25 @@ tidy:
 #	- HE2LYA	Optionally computes the HeII Lyman-alpha optical depths. 
 #
 #	- SILICON	Optionally computes SiII (1190, 1193, 1260) and SiIII (1207)
-#			optical depths.  Always uses a Gaussian profile.
+#			optical depths.  Always uses a Gaussian profile.  The density 
+#			independent [Si/H] is set in parameters.h
+#
+#	- SILICON_POD	Density dependent pixel optical depth value for [Si/H], using 
+#			[C/H] from Schaye et al. 2003, ApJ, 596, 768, eq. (8) and 
+#			[Si/C]=0.77 from Table 2 of Aguirre et al. 2004, ApJ, 602, 38.  
+#			Overides the default [Si/H] model.  Note the POD metallicities 
+#			are derived assuming a Haardt & Madau UVB model. 
 #
 #	- SELF_SHIELD 	Adds a post-processed correction for the self-shielding
-#			of neutral hydrogen. 
+#			of neutral hydrogen.  Does not make much difference for
+#			quick-Lya runs due to missing dense gas.
 #
 #	- NO_PECVEL 	Computes the spectra ignoring gas peculiar velocities.
 #
 #	- VOIGT 	Computes the Lyman-alpha spectra with a Voigt profile
 # 			instead of a Gaussian, following Tepper-Garcia (2006,
 #			MNRAS, 369, 2025).  Slower than the Gaussian
-#			and introduces some shot noise on small scales
+#			and can introduce some noise on small scales
 #			in the power spectrum.  This should be well
 #			below observable scales, but this needs to be
 #			verified by the user.
@@ -114,10 +123,11 @@ tidy:
 #			left on.
 #
 #	- QUICK_GAUSS   Uses a look-up table for the Gaussian profile.
-#			Faster and so useful for a quick check, but
-#			slightly less accurate far from the line
-#			centre.  Can introduce some shot noise on
-#			small scales.  Use with care.
+#			This is much faster but will be slightly less 
+#			accurate far from the line centre.  Can also introduce
+#			some noise on small scales. One should *ALWAYS CHECK* it
+#			does not impact on the power spectrum adversely. Note
+#			this flag can be used with or without VOIGT.
 #
 #	- TEST_KERNEL 	Test option.  Can be used to assess if the LOS pixel
 #			scale properly resolves the thermal broadening

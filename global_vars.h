@@ -18,6 +18,9 @@ double ztime,omegam,omegal,omegab,h100,box100,Xh;
 #error "TEST_KERNEL requires NO_PECVEL"
 #endif
 
+#if defined(SILICON_POD) && !defined(SILICON)
+#error "SILICON_POD requires SILICON"
+#endif
 
 /* Numbers */
 #define  PI    3.14159265358979323846

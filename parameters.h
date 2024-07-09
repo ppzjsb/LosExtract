@@ -1,18 +1,18 @@
 
 /*---------------------- Global parameters ---------------------------*/
 
-/* Files to extract */
-#define NLOSFILES 1    /* Number of LOS files to extract */
+#define NLOSFILES 1 /* Number of LOS files to extract */
 
-#define ZI_LOS    3.0  /* Redshift of first LOS file */
+#define ZI_LOS 3.0  /* Redshift of first LOS file */
 
-#define DZ_LOS    1.0  /* Output interval in Delta z for LOS files.
-			  Irrelevant if NLOSFILES=1 */
+#define DZ_LOS 1.0  /* Output interval in Delta z for LOS files.
+		       Irrelevant if NLOSFILES=1 */
 
-/* The base of the LOS file name */
-#define LOSBASE "los2048_n5000"
+#define LOSBASE "los2048_n5000"  /* The base of the LOS file name */
 
-/* The UV background file (should be placed in the /treecool directory) */
-#define UVBFILE "TREECOOL_P19" 
-			
+#define UVBFILE "TREECOOL_P19" /* UV background file in /treecool/ */
+
+#define Z_SI -2.0  /* [Si/H] for density independent metallicity (default
+		      behaviour if not using METALS_POD flag) */	
+		
 /*--------------------------------------------------------------------*/

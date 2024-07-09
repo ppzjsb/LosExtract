@@ -21,7 +21,7 @@ SILICON   = 1
 TEST_KERNEL = 0
 
 ;; Select LOS (0 to NUMLOS-1)
-PLOTLOS = 100
+PLOTLOS = 42
 
 base      = '../../'
 
@@ -106,7 +106,7 @@ endif
 window,0,xsize=1200,ysize=350,title='HI-Lya'
 Device,Retain=2,true_color=24,decomposed=0
 !p.font=-1
-plot,velaxis,exp(-tau_H1[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),xstyle=1,ystyle=1,charsize=1.75,yrange=[-0.1,1.1],ytitle='Transmitted flux',xtitle='Hubble velocity [km/s]'
+plot,velaxis,exp(-tau_H1[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),xstyle=1,ystyle=1,charsize=1.75,yrange=[-0.1,1.1],ytitle='Transmitted flux (HI-Lya)',xtitle='Hubble velocity [km/s]'
 if (TAUW_FLAG eq 1) then begin
    loadct,5
    oplot,velaxis,(alog10(density_tau[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]) - min(alog10(density_tau[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1])))/max(alog10(density_tau[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1])- min(alog10(density_tau[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]))),linestyle=1,color=50
@@ -120,7 +120,7 @@ if HE2_FLAG eq 1 then begin
    window,1,xsize=1200,ysize=350,title='HeII-Lya'
    Device,Retain=2,true_color=24,decomposed=0
    !p.font=-1
-   plot,velaxis,exp(-tau_He2[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),xstyle=1,ystyle=1,charsize=1.75,yrange=[-0.1,1.1],ytitle='Transmitted flux',xtitle='Hubble velocity [km/s]'
+   plot,velaxis,exp(-tau_He2[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),xstyle=1,ystyle=1,charsize=1.75,yrange=[-0.1,1.1],ytitle='Transmitted flux (HeII-Lya)',xtitle='Hubble velocity [km/s]'
    if (TAUW_FLAG eq 1) then begin
       loadct,5
       oplot,velaxis,(alog10(density_tau_He2[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]) - min(alog10(density_tau_He2[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1])))/max(alog10(density_tau_He2[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1])- min(alog10(density_tau_He2[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]))),linestyle=1,color=50
@@ -134,12 +134,11 @@ if SILICON eq 1 then begin
    window,1,xsize=1200,ysize=350,title='SiII and SiIII'
    Device,Retain=2,true_color=24,decomposed=0
    !p.font=-1
-   plot,velaxis,tau_Si2_1190[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1],/yl,yrange=[1.0e-7,10.0],xstyle=1,ystyle=1,charsize=1.75,ytitle='Optical depth (SiII, SiIII)',xtitle='Hubble velocity [km/s]'
-   oplot,velaxis,tau_Si2_1193[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1],linestyle=1,color=150
-   oplot,velaxis,tau_Si2_1260[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1],linestyle=2,color=175
-   oplot,velaxis,tau_Si3_1207[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1],linestyle=3,color=200
+   plot,velaxis,exp(-tau_Si2_1190[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),yrange=[-0.1,1.1],xstyle=1,ystyle=1,charsize=1.75,ytitle='Transmitted flux (SiII, SiIII)',xtitle='Hubble velocity [km/s]'
+   oplot,velaxis,exp(-tau_Si2_1193[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=1,color=150
+   oplot,velaxis,exp(-tau_Si2_1260[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=2,color=175
+   oplot,velaxis,exp(-tau_Si3_1207[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=3,color=200
 endif
-
 
 ;; Plot temperature-density plane, 10000 random points
 ind = floor(n_elements(density)*randomu(10, 10000,/uniform))
