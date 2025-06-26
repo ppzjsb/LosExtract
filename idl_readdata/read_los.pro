@@ -44,6 +44,11 @@ temp_H1  = dblarr(numlos*nbins)
 vpec_H1  = dblarr(numlos*nbins)
 readu,1,H1frac,temp_H1,vpec_H1
 
+if HYBRID_RT eq 1 then begin
+   gJH0 = dblarr(numlos*nbins)
+   readu,1,gJH0
+endif
+
 if HE2_FLAG eq 1 then begin
 ;; HeII data (HeIII/H, T in K, vpec in km/s)
    He2frac   = dblarr(numlos*nbins) 
@@ -65,6 +70,7 @@ close,2
 ind = where(finite(tau_H1) eq 0)
 if(ind(0) ne -1) then begin
    print,'Bad elements in tau_H1!',n_elements(ind)
+   print,ind(0)/nbins
 endif
 
 

@@ -10,26 +10,31 @@ pro get_losdata
 ;; Flag for optical depth weighted quantities (0 or 1)
 TAUW_FLAG = 0
 
+;; Flag for Hybrid-RT outputs that include Gamma_H1(r) (0 or 1)
+HYBRID_RT = 1
+
 ;; Flag for HeII Lyman-alpha (0 or 1)
 HE2_FLAG  = 0
 
 ;; Flag for SiII and SiIII absorption (0 or 1)
-SILICON   = 1
+SILICON   = 0
 
 ;; Flag for test of line profile convolution (0 or 1).  The GP optical
 ;; depths should be recovered.
 TEST_KERNEL = 0
 
 ;; Select LOS (0 to NUMLOS-1)
-PLOTLOS = 42
+PLOTLOS = 101
 
 base      = '../../'
 
 ;;-------------------------------------------------------------------
 
-;;filename1 = base+'spec1024_n5000_z2.000.dat'
-filename1 = base+'los2048_n5000_z3.000.dat'
-filename2 = base+'tauH1_v2048_n5000_z3.000.dat'
+;filename1 = base+'los_v2048_n5000_z7.000.dat'
+;filename2 = base+'tauH1_v2048_n5000_z7.000.dat'
+
+filename1 = base+'halolos2048_n5000_z7.000.dat'
+filename2 = base+'halotau2048_n5000_z7.000.dat'
 
 if TAUW_FLAG eq 1 then  begin
    filename3 = base+'tauwH1_x256_n5000_z2.000.dat'
@@ -61,8 +66,8 @@ ind = where(density gt 1000.0 and temp_H1 lt 1.0e5)
 if(ind(0) ne -1) then begin
    print
    print,'Pixels where Delta > 1000 and log*T/K) < 5:',n_elements(ind)
-   print,alog10(temp_H1(ind))
-   print,alog10(density(ind))
+  ; print,alog10(temp_H1(ind))
+  ; print,alog10(density(ind))
 endif
    
 
@@ -101,6 +106,11 @@ if HE2_FLAG eq 1 then begin
    print
 endif
 
+if HYBRID_RT eq 1 then begin
+   print,'Range of log(Gamma_H1)'
+   print,alog10(min(gJH0)),alog10(max(gJH0))
+   print
+endif
 
 ;; Plot transmission in first sight-line
 window,0,xsize=1200,ysize=350,title='HI-Lya'
@@ -145,9 +155,24 @@ ind = floor(n_elements(density)*randomu(10, 10000,/uniform))
 window,2,xsize=500,ysize=500
 Device,Retain=2
 !p.font=-1
-plot,alog10(density(ind)),alog10(temp_H1(ind)),xstyle=1,ystyle=1,charsize=1.75,xtitle='log Overdensity',ytitle='log Temperature',psym=3,xrange=[-2,3],yrange=[2,6]
+plot,alog10(density(ind)),alog10(temp_H1(ind)),xstyle=1,ystyle=1,charsize=1.75,xtitle='log density',ytitle='log temperature',psym=3,xrange=[-2,3],yrange=[-1,5]
 if HE2_FLAG eq 1 then begin
    oplot,alog10(density(ind)),alog10(temp_He2(ind)),psym=3,color=100
+endif
+
+;; Some checks on the patchy photoionisation rate
+if HYBRID_RT eq 1 then begin
+   window,1,xsize=1200,ysize=350
+   Device,Retain=2,true_color=24,decomposed=0
+   !p.font=-1
+   plot,velaxis,alog10(density[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),xstyle=1,ystyle=1,charsize=1.75,yrange=[-3,3],ytitle='Density, PIrate, H1frac',xtitle='Hubble velocity [km/s]'
+   oplot,velaxis,0.5*(alog10(gJH0[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1])+16),linestyle=1,color=100
+   oplot,velaxis,0.5*(alog10(H1frac[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1])+4),linestyle=5,color=150
+   
+   window,3,xsize=500,ysize=500
+   Device,Retain=2
+   !p.font=-1
+   plot,alog10(H1frac(ind)),alog10(gJH0(ind)),xstyle=1,ystyle=1,charsize=1.75,xtitle='log H1frac',ytitle='log PI rate',psym=3,xrange=[-6.5,0.5],yrange=[-30,-8]
 endif
 
 

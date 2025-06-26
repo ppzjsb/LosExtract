@@ -10,11 +10,11 @@
 #--------------------------------------- Compile-time options
 
 
-OPTS +=-DOPENMP
+#OPTS +=-DOPENMP
 #OPTS +=-DTAU_WEIGHT
 #OPTS +=-DHE2LYA
-OPTS +=-DSILICON
-OPTS +=-DSILICON_POD
+#OPTS +=-DSILICON
+#OPTS +=-DSILICON_POD
 #OPTS +=-DSELF_SHIELD
 #OPTS +=-DNO_PECVEL
 OPTS +=-DVOIGT
@@ -23,9 +23,9 @@ OPTS +=-DREBIN_KERNEL
 #OPTS +=-DTEST_KERNEL
 
 #--------------------------------------- Select system
-SYSTYPE="pppzjsb02"
+#SYSTYPE="pppzjsb02"
 #SYSTYPE="brahan"
-#SYSTYPE="macbook13"
+SYSTYPE="macbook13"
 
 
 ifeq ($(SYSTYPE),"pppzjsb02")

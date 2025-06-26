@@ -9,7 +9,7 @@
 pro get_pk
   
 ;; Flags for processing spectra
-RESCALE   = 0  ;; optionally rescale to observed tau_eff
+RESCALE   = 1  ;; optionally rescale to observed tau_eff
 CONVOLVE  = 0  ;; optionally convolve with Gaussian with FWHM=7km/s
 REBIN     = 0  ;; optionally rebin/rsample P(k) to be equally spaced log10(k)
 
@@ -22,7 +22,7 @@ modval  = ['']
 
 ;; Select redshifts
 ;;zval    = ['2.000','3.000','4.000','5.000']
-zval    = ['3.000']
+zval    = ['4.200']
 
 ;; Set range for rebinning here
 kmin    = -2.9d
