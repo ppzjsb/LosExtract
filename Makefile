@@ -9,23 +9,22 @@
 
 #--------------------------------------- Compile-time options
 
-
-#OPTS +=-DOPENMP
+OPTS +=-DOPENMP
 #OPTS +=-DTAU_WEIGHT
 #OPTS +=-DHE2LYA
-#OPTS +=-DSILICON
+OPTS +=-DSILICON
 #OPTS +=-DSILICON_POD
 #OPTS +=-DSELF_SHIELD
 #OPTS +=-DNO_PECVEL
 OPTS +=-DVOIGT
-OPTS +=-DREBIN_KERNEL
-#OPTS +=-DQUICK_GAUSS
+OPTS +=-DRESAMPLE
+OPTS +=-DQUICK_LINE
 #OPTS +=-DTEST_KERNEL
 
 #--------------------------------------- Select system
-#SYSTYPE="pppzjsb02"
+SYSTYPE="pppzjsb02"
 #SYSTYPE="brahan"
-SYSTYPE="macbook13"
+#SYSTYPE="macbook13"
 
 
 ifeq ($(SYSTYPE),"pppzjsb02")
@@ -106,28 +105,22 @@ tidy:
 #
 #	- NO_PECVEL 	Computes the spectra ignoring gas peculiar velocities.
 #
-#	- VOIGT 	Computes the Lyman-alpha spectra with a Voigt profile
-# 			instead of a Gaussian, following Tepper-Garcia (2006,
-#			MNRAS, 369, 2025).  Slower than the Gaussian
-#			and can introduce some noise on small scales
-#			in the power spectrum.  This should be well
-#			below observable scales, but this needs to be
-#			verified by the user.
+#	- VOIGT 	Computes the Lyman-alpha spectra with a Voigt profile instead of a
+#			Gaussian, following Tepper-Garcia (2006, MNRAS, 369, 2025).  Slower
+#			than the Gaussian and can introduce some noise on small scales
+#			in the power spectrum.  This should be well below observable scales,
+# 			but this needs to be verified by the user.
 #
-#	- REBIN _KERNEL Performs a check on the sampling rate of the
-#			thermal broadening kernel.  If the native
-#			resolution of the input files are
-#			undersampling the kernel, this performs a
-#			rebinning using linear interpolation.  It is
-#			*strongly recommended* this option is always
-#			left on.
+#	- RESAMPLE	Performs a check on the sampling rate of the thermal broadening
+#			kernel.  If the native resolution of the input files are
+#			undersampling the kernel, this performs a resample using linear
+#			interpolation. It is *strongly recommended* this option is always
+#			left on to ensure optical depth convergence.
 #
-#	- QUICK_GAUSS   Uses a look-up table for the Gaussian profile.
-#			This is much faster but will be slightly less 
-#			accurate far from the line centre.  Can also introduce
-#			some noise on small scales. One should *ALWAYS CHECK* it
-#			does not impact on the power spectrum adversely. Note
-#			this flag can be used with or without VOIGT.
+#	- QUICK_LINE    Uses a combination of a Taylor expansion and a look-up table for
+#			the negative exponential term in the line profile.  This is faster
+#			than the default and just as accurate for the cost of an extra
+#			7.6 MiB memory.
 #
 #	- TEST_KERNEL 	Test option.  Can be used to assess if the LOS pixel
 #			scale properly resolves the thermal broadening

@@ -59,7 +59,7 @@ double lerp(double x, double x0, double x1, double y0, double y1)
 {
   double y;
 
-  y = y0 + (x-x0) * (y1-y0) / (x1-x0);
+  y = y0 + (x - x0) * (y1 - y0)/(x1 - x0);
 
   return y;
 }

@@ -11,48 +11,46 @@ pro get_losdata
 TAUW_FLAG = 0
 
 ;; Flag for Hybrid-RT outputs that include Gamma_H1(r) (0 or 1)
-HYBRID_RT = 1
+HYBRID_RT = 0
 
 ;; Flag for HeII Lyman-alpha (0 or 1)
 HE2_FLAG  = 0
 
 ;; Flag for SiII and SiIII absorption (0 or 1)
-SILICON   = 0
+SILICON   = 1
 
 ;; Flag for test of line profile convolution (0 or 1).  The GP optical
 ;; depths should be recovered.
 TEST_KERNEL = 0
 
 ;; Select LOS (0 to NUMLOS-1)
-PLOTLOS = 101
+PLOTLOS = 100
 
-base      = '../../'
+base      = '../../test_data/'
 
 ;;-------------------------------------------------------------------
 
-;filename1 = base+'los_v2048_n5000_z7.000.dat'
-;filename2 = base+'tauH1_v2048_n5000_z7.000.dat'
+filename1 = base+'los2048_n5000_z3.000.dat'
+filename2 = base+'tauH1r2qg_v2048_n5000_z3.000.dat'
 
-filename1 = base+'halolos2048_n5000_z7.000.dat'
-filename2 = base+'halotau2048_n5000_z7.000.dat'
 
 if TAUW_FLAG eq 1 then  begin
-   filename3 = base+'tauwH1_x256_n5000_z2.000.dat'
+   filename3 = base+'tauwH1_v2048_n5000_z2.000.dat'
 endif
 
 if HE2_FLAG eq 1 then begin
-   filename4 = base+'tauHe2_x256_n5000_z2.000.dat'
+   filename4 = base+'tauHe2_v2048_n5000_z2.000.dat'
    
    if TAUW_FLAG eq 1 then  begin
-      filename5 = base+'tauwHe2_x256_n5000_z2.000.dat'
+      filename5 = base+'tauwHe2_v2048_n5000_z2.000.dat'
    endif
 endif
 
 if SILICON eq 1 then begin
-   filename6 = base+'tauSi2_1190_v2048_n5000_z3.000.dat'
-   filename7 = base+'tauSi2_1193_v2048_n5000_z3.000.dat'
-   filename8 = base+'tauSi2_1260_v2048_n5000_z3.000.dat'
-   filename9 = base+'tauSi3_1207_v2048_n5000_z3.000.dat'
+   filename6 = base+'tauSi2r2qg_1190_v2048_n5000_z3.000.dat'
+   filename7 = base+'tauSi2r2qg_1193_v2048_n5000_z3.000.dat'
+   filename8 = base+'tauSi2r2qg_1260_v2048_n5000_z3.000.dat'
+   filename9 = base+'tauSi3r2qg_1207_v2048_n5000_z3.000.dat'
 endif
    
 @read_los
@@ -112,6 +110,14 @@ if HYBRID_RT eq 1 then begin
    print
 endif
 
+
+if SILICON eq 1 then begin
+   print,'Range of log(tau_Si3)'
+   print,alog10(min(tau_Si3_1207)),alog10(max(tau_Si3_1207))
+   print
+endif
+
+
 ;; Plot transmission in first sight-line
 window,0,xsize=1200,ysize=350,title='HI-Lya'
 Device,Retain=2,true_color=24,decomposed=0
@@ -144,21 +150,22 @@ if SILICON eq 1 then begin
    window,1,xsize=1200,ysize=350,title='SiII and SiIII'
    Device,Retain=2,true_color=24,decomposed=0
    !p.font=-1
-   plot,velaxis,exp(-tau_Si2_1190[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),yrange=[-0.1,1.1],xstyle=1,ystyle=1,charsize=1.75,ytitle='Transmitted flux (SiII, SiIII)',xtitle='Hubble velocity [km/s]'
-   oplot,velaxis,exp(-tau_Si2_1193[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=1,color=150
-   oplot,velaxis,exp(-tau_Si2_1260[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=2,color=175
-   oplot,velaxis,exp(-tau_Si3_1207[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=3,color=200
+   loadct,5
+   plot,velaxis,exp(-tau_Si2_1190[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),yrange=[-0.1,1.1],xrange=[0,200],xstyle=1,ystyle=1,charsize=1.75,ytitle='Transmitted flux (SiII, SiIII)',xtitle='Hubble velocity [km/s]'
+   oplot,velaxis,exp(-tau_Si2_1193[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=0,color=150
+   oplot,velaxis,exp(-tau_Si2_1260[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=0,color=175
+   oplot,velaxis,exp(-tau_Si3_1207[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=0,color=200
 endif
 
 ;; Plot temperature-density plane, 10000 random points
-ind = floor(n_elements(density)*randomu(10, 10000,/uniform))
-window,2,xsize=500,ysize=500
-Device,Retain=2
-!p.font=-1
-plot,alog10(density(ind)),alog10(temp_H1(ind)),xstyle=1,ystyle=1,charsize=1.75,xtitle='log density',ytitle='log temperature',psym=3,xrange=[-2,3],yrange=[-1,5]
-if HE2_FLAG eq 1 then begin
-   oplot,alog10(density(ind)),alog10(temp_He2(ind)),psym=3,color=100
-endif
+;; ind = floor(n_elements(density)*randomu(10, 10000,/uniform))
+;; window,2,xsize=500,ysize=500
+;; Device,Retain=2
+;; !p.font=-1
+;; plot,alog10(density(ind)),alog10(temp_H1(ind)),xstyle=1,ystyle=1,charsize=1.75,xtitle='log density',ytitle='log temperature',psym=3,xrange=[-2,3],yrange=[-1,5]
+;; if HE2_FLAG eq 1 then begin
+;;    oplot,alog10(density(ind)),alog10(temp_He2(ind)),psym=3,color=100
+;; endif
 
 ;; Some checks on the patchy photoionisation rate
 if HYBRID_RT eq 1 then begin

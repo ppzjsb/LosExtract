@@ -64,9 +64,8 @@ double ztime,omegam,omegal,omegab,h100,box100,Xh;
 #define  FOSC_1260_Si2   1.180
 #define  LAMBDA_1207_Si3 1206.50e-8
 #define  FOSC_1207_Si3   1.63000
- 
 
-/* Gaussian profile table */
-#define GXMAX  100.0
-#define NGXTAB 1000000
+/* Line profile table */
+#define XMAX  100.0
+#define NXTAB 1000000
 

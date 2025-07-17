@@ -10,15 +10,13 @@
 
 /* extract_los.c */
 void read_los(void);
-void resample_los(double vmax);
+double resample(int ilos, int iconv, double vmax, double *field);
 void write_tau(void);
 void compute_absorption(void);
 void allocate_los_memory(void);
-void allocate_los_hires_memory(void);
 void free_los_memory(void);
-void free_los_hires_memory(void);
-#ifdef QUICK_GAUSS
-void GaussianProfileTable(void);
+#ifdef QUICK_LINE
+void LineProfileTable(void);
 #endif
 
 /* ion_balance.c */

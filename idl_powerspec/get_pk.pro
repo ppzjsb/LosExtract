@@ -9,12 +9,12 @@
 pro get_pk
   
 ;; Flags for processing spectra
-RESCALE   = 1  ;; optionally rescale to observed tau_eff
+RESCALE   = 0  ;; optionally rescale to observed tau_eff
 CONVOLVE  = 0  ;; optionally convolve with Gaussian with FWHM=7km/s
 REBIN     = 0  ;; optionally rebin/rsample P(k) to be equally spaced log10(k)
 
 ;; Location of input files
-base = '../../'
+base = '../../test_data/'
 
 ;; Select models
 ;;modval  = ['planck1_40_512_G3/']
@@ -22,7 +22,7 @@ modval  = ['']
 
 ;; Select redshifts
 ;;zval    = ['2.000','3.000','4.000','5.000']
-zval    = ['4.200']
+zval    = ['3.000']
 
 ;; Set range for rebinning here
 kmin    = -2.9d
