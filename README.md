@@ -57,8 +57,9 @@ Faucher-Giguere 2020, MNRAS, 493, 1614.
 
 cloudy_tables/ contains a pre-computed look-up table with metal ion
 fractions as a function of temperature, density and redshift.  At
-present, only Si-II and Si-III abundances are available.  These have
-been computed assuming the Puchwein et al. 2019 UV background model.
+present, only Si-II, Si-III and Si-IV abundances are available.  These
+have been computed assuming the Puchwein et al. 2019 UV background
+model.
 
 idl_readdata/ contains a simple IDL code that reads in the output from
 SpecExtract.

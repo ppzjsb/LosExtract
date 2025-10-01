@@ -16,7 +16,7 @@ HYBRID_RT = 0
 ;; Flag for HeII Lyman-alpha (0 or 1)
 HE2_FLAG  = 0
 
-;; Flag for SiII and SiIII absorption (0 or 1)
+;; Flag for SiII, SiIII and SiIV absorption (0 or 1)
 SILICON   = 1
 
 ;; Flag for test of line profile convolution (0 or 1).  The GP optical
@@ -24,14 +24,14 @@ SILICON   = 1
 TEST_KERNEL = 0
 
 ;; Select LOS (0 to NUMLOS-1)
-PLOTLOS = 100
+PLOTLOS = 542
 
-base      = '../../test_data/'
+base      = '../../../los/'
 
 ;;-------------------------------------------------------------------
 
 filename1 = base+'los2048_n5000_z3.000.dat'
-filename2 = base+'tauH1r2qg_v2048_n5000_z3.000.dat'
+filename2 = base+'tauH1_v2048_n5000_z3.000.dat'
 
 
 if TAUW_FLAG eq 1 then  begin
@@ -47,10 +47,12 @@ if HE2_FLAG eq 1 then begin
 endif
 
 if SILICON eq 1 then begin
-   filename6 = base+'tauSi2r2qg_1190_v2048_n5000_z3.000.dat'
-   filename7 = base+'tauSi2r2qg_1193_v2048_n5000_z3.000.dat'
-   filename8 = base+'tauSi2r2qg_1260_v2048_n5000_z3.000.dat'
-   filename9 = base+'tauSi3r2qg_1207_v2048_n5000_z3.000.dat'
+   filename6  = base+'tauSi2_1190_v2048_n5000_z3.000.dat'
+   filename7  = base+'tauSi2_1193_v2048_n5000_z3.000.dat'
+   filename8  = base+'tauSi2_1260_v2048_n5000_z3.000.dat'
+   filename9  = base+'tauSi3_1207_v2048_n5000_z3.000.dat'
+   filename10 = base+'tauSi4_1394_v2048_n5000_z3.000.dat'
+   filename11 = base+'tauSi4_1403_v2048_n5000_z3.000.dat'    
 endif
    
 @read_los
@@ -147,14 +149,21 @@ if HE2_FLAG eq 1 then begin
 endif
 
 if SILICON eq 1 then begin
-   window,1,xsize=1200,ysize=350,title='SiII and SiIII'
+   window,1,xsize=1200,ysize=350,title='SiII, SiIII and SiIV'
    Device,Retain=2,true_color=24,decomposed=0
    !p.font=-1
    loadct,5
-   plot,velaxis,exp(-tau_Si2_1190[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),yrange=[-0.1,1.1],xrange=[0,200],xstyle=1,ystyle=1,charsize=1.75,ytitle='Transmitted flux (SiII, SiIII)',xtitle='Hubble velocity [km/s]'
-   oplot,velaxis,exp(-tau_Si2_1193[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=0,color=150
-   oplot,velaxis,exp(-tau_Si2_1260[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=0,color=175
-   oplot,velaxis,exp(-tau_Si3_1207[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=0,color=200
+   plot,velaxis,exp(-tau_Si2_1190[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),yrange=[-0.1,1.1],xrange=[2000,2200],xstyle=1,ystyle=1,charsize=1.75,ytitle='Transmitted flux (SiII, SiIII)',xtitle='Hubble velocity [km/s]'
+   
+   oplot,velaxis,exp(-tau_Si2_1190[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=0,color=100
+   oplot,velaxis,exp(-tau_Si2_1193[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=1,color=100
+   oplot,velaxis,exp(-tau_Si2_1260[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=2,color=100
+   
+   oplot,velaxis,exp(-tau_Si3_1207[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=0,color=150
+   
+   oplot,velaxis,exp(-tau_Si4_1394[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=0,color=200
+   oplot,velaxis,exp(-tau_Si4_1403[PLOTLOS*nbins :(PLOTLOS+1)*nbins-1]),linestyle=1,color=200
+
 endif
 
 ;; Plot temperature-density plane, 10000 random points

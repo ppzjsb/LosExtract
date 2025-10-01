@@ -5,7 +5,7 @@
  *                                                                                                         
  *  \brief Routine for reading in pre-computed cloudy tables with
  *  metal ion abundances.  These can then be interpolated with respect
- *  to log(nH/cm^-3) and log10(T/K) 
+ *  to log10(nH/cm^-3) and log10(T/K) 
  */
 
 /********************************************************************************/
@@ -21,8 +21,8 @@
 #include "parameters.h"
 #include "proto.h"
 
-double *Si2frac, *Si3frac;
-double *Si2frac_tab, *Si3frac_tab;
+double *Si2frac, *Si3frac, *Si4frac;
+double *Si2frac_tab, *Si3frac_tab, *Si4frac_tab;
 double ztab_min,ztab_max,ttab_min,ttab_max,dtab_min,dtab_max;
 
 int n_ztab,n_ttab,n_dtab;
@@ -36,15 +36,20 @@ int n_ztab,n_ttab,n_dtab;
  *  \param lognH  The input hydrogen number density, log10(nH/cm^-3)
  *  \param *Si2frac   Pointer containing the requested Si+/Si (i.e. Si-II)
  *  \param *Si3frac   Pointer containing the requested Si2+/Si (i.e. Si-III)
+ *  \param *Si4frac   Pointer containing the requested Si3+/Si (i.e. Si-IV)
  */
 
-void get_ionfrac(double logT, double lognH, double *Si2frac, double *Si3frac)
+void get_ionfrac(double logT, double lognH, double *Si2frac, double *Si3frac, double *Si4frac)
 { 
   double *Si2frac_zint = (double *)calloc(n_ttab*n_dtab, sizeof(double));
   if(NULL==Si2frac_zint){free(Si2frac_zint); printf("Memory allocation failed.\n"); exit(0);}
   
   double *Si3frac_zint = (double *)calloc(n_ttab*n_dtab, sizeof(double));
   if(NULL==Si3frac_zint){free(Si3frac_zint); printf("Memory allocation failed.\n"); exit(0);}
+  
+  double *Si4frac_zint = (double *)calloc(n_ttab*n_dtab, sizeof(double));
+  if(NULL==Si4frac_zint){free(Si4frac_zint); printf("Memory allocation failed.\n"); exit(0);}
+  
   
   /* Redshift interpolation */
   double ztab_bin_inv = ((double)n_ztab - 1.0) / (ztab_max - ztab_min);  
@@ -69,6 +74,7 @@ void get_ionfrac(double logT, double lognH, double *Si2frac, double *Si3frac)
 	long long ind = it + id*n_ttab;
 	Si2frac_zint[ind] = flow * Si2frac_tab[ind + j*zoff] + fhi * Si2frac_tab[ind + (j+1)*zoff];
 	Si3frac_zint[ind] = flow * Si3frac_tab[ind + j*zoff] + fhi * Si3frac_tab[ind + (j+1)*zoff];
+	Si4frac_zint[ind] = flow * Si4frac_tab[ind + j*zoff] + fhi * Si4frac_tab[ind + (j+1)*zoff];
       }
   
   
@@ -78,6 +84,10 @@ void get_ionfrac(double logT, double lognH, double *Si2frac, double *Si3frac)
 
   double *Si3frac_dint = (double *)calloc(n_ttab, sizeof(double));
   if(NULL==Si3frac_dint){free(Si3frac_dint); printf("Memory allocation failed.\n"); exit(0);}
+
+  double *Si4frac_dint = (double *)calloc(n_ttab, sizeof(double));
+  if(NULL==Si4frac_dint){free(Si4frac_dint); printf("Memory allocation failed.\n"); exit(0);}
+  
   
   /* log(nH/cm^-3) interpolation */
   lognH = dmin(dmax(lognH, dtab_min), dtab_max-1.0e-6); /* protect boundaries */
@@ -93,6 +103,7 @@ void get_ionfrac(double logT, double lognH, double *Si2frac, double *Si3frac)
     {
       Si2frac_dint[it] = flow * Si2frac_zint[it + j*doff] + fhi * Si2frac_zint[it + (j+1)*doff];
       Si3frac_dint[it] = flow * Si3frac_zint[it + j*doff] + fhi * Si3frac_zint[it + (j+1)*doff];
+      Si4frac_dint[it] = flow * Si4frac_zint[it + j*doff] + fhi * Si4frac_zint[it + (j+1)*doff];
     }
   
   /* log(T/K) interpolation */
@@ -106,12 +117,15 @@ void get_ionfrac(double logT, double lognH, double *Si2frac, double *Si3frac)
   
   *Si2frac = pow(10.0, flow * Si2frac_dint[j] + fhi * Si2frac_dint[j+1]);
   *Si3frac = pow(10.0, flow * Si3frac_dint[j] + fhi * Si3frac_dint[j+1]);
+  *Si4frac = pow(10.0, flow * Si4frac_dint[j] + fhi * Si4frac_dint[j+1]);
   
   free(Si2frac_zint);
   free(Si3frac_zint);
+  free(Si4frac_zint);
   
   free(Si2frac_dint);
   free(Si3frac_dint);
+  free(Si4frac_dint);
 }
 
 
@@ -167,6 +181,7 @@ void read_iontable(char *fname)
     }
   fread(Si2frac_tab,sizeof(double),n_dtab*n_ttab*n_ztab,input);
   fread(Si3frac_tab,sizeof(double),n_dtab*n_ttab*n_ztab,input);
+  fread(Si4frac_tab,sizeof(double),n_dtab*n_ttab*n_ztab,input);
   fclose(input);
 }
 
@@ -181,6 +196,9 @@ void InitIonTableMemory(void)
   
   Si3frac_tab = (double *)calloc(n_ttab*n_dtab*n_ztab, sizeof(double));
   if(NULL==Si3frac_tab){free(Si3frac_tab); printf("Memory allocation failed.\n"); exit(0);}
+
+  Si4frac_tab = (double *)calloc(n_ttab*n_dtab*n_ztab, sizeof(double));
+  if(NULL==Si4frac_tab){free(Si4frac_tab); printf("Memory allocation failed.\n"); exit(0);}
 }
 
 #endif

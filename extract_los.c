@@ -41,7 +41,7 @@ double *rho_tau_He2, *temp_tau_He2;
 #endif
 
 #ifdef SILICON
-double *tau_1190_Si2, *tau_1193_Si2, *tau_1260_Si2, *tau_1207_Si3;
+double *tau_1190_Si2, *tau_1193_Si2, *tau_1260_Si2, *tau_1207_Si3, *tau_1394_Si4, *tau_1403_Si4;
 #endif
 
 double *xlos, *ylos, *zlos;
@@ -220,21 +220,31 @@ void compute_absorption()
 #endif
   
   
-  /* SiII (1190,1193,1260) and SiIII (1207) */
+  /* SiII (1190,1193,1260), SiIII (1207) and SiIV (1394,1403) */
 #ifdef SILICON
   double b_Si, b2_Si[nbins*nhires];
+
   double tau_1190_Si2_dR[nbins*nhires], tau_1193_Si2_dR[nbins*nhires];
   double tau_1260_Si2_dR[nbins*nhires], tau_1207_Si3_dR[nbins*nhires];
-  double Si2frac, Si3frac;
+  double tau_1394_Si4_dR[nbins*nhires], tau_1403_Si4_dR[nbins*nhires];
+  
+  double Si2frac, Si3frac, Si4frac;
+
   double sigma_1190_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1190_Si2 * FOSC_1190_Si2;
   double sigma_1193_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1193_Si2 * FOSC_1193_Si2;
   double sigma_1260_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1260_Si2 * FOSC_1260_Si2;
   double sigma_1207_Si3   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1207_Si3 * FOSC_1207_Si3;
+  double sigma_1394_Si4   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1394_Si4 * FOSC_1394_Si4;
+  double sigma_1403_Si4   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1403_Si4 * FOSC_1403_Si4;
+
   double k1_conv_Si       = 2.0 * BOLTZMANN / (SIMASS * AMU);
+
   double k2_conv_1190_Si2 = sigma_1190_Si2 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
   double k2_conv_1193_Si2 = sigma_1193_Si2 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
   double k2_conv_1260_Si2 = sigma_1260_Si2 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
   double k2_conv_1207_Si3 = sigma_1207_Si3 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
+  double k2_conv_1394_Si4 = sigma_1394_Si4 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
+  double k2_conv_1403_Si4 = sigma_1403_Si4 * C * rscale * drbin * critH / (sqrt(PI) * HMASS * AMU);
 #endif
 
 
@@ -354,10 +364,11 @@ void compute_absorption()
 	  double logT  = log10(temp_wk_H1_hires); /* K */
 	  double lognH = log10(critH * rho_wk_H_hires / (HMASS * AMU)); /* cm^-3 */
 	  
-	  get_ionfrac(logT, lognH, &Si2frac, &Si3frac); 
+	  get_ionfrac(logT, lognH, &Si2frac, &Si3frac, &Si4frac); 
 	  
 	  double Si2_Hfrac = Si2frac * ZSi_rel * SI_SOLAR; /* SiII/H */
 	  double Si3_Hfrac = Si3frac * ZSi_rel * SI_SOLAR; /* SiIII/H */
+	  double Si4_Hfrac = Si4frac * ZSi_rel * SI_SOLAR; /* SiIV/H */
 	  
 	  b_Si         = sqrt(k1_conv_Si * temp_wk_H1_hires); /* cm s^-1 */
 	  b2_Si[iconv] = b_Si * b_Si / escale;  /* (km s^-1)^2 */
@@ -366,6 +377,9 @@ void compute_absorption()
 	  tau_1193_Si2_dR[iconv] = (k2_conv_1193_Si2 / k2_conv_1190_Si2) * tau_1190_Si2_dR[iconv];
 	  tau_1260_Si2_dR[iconv] = (k2_conv_1260_Si2 / k2_conv_1190_Si2) * tau_1190_Si2_dR[iconv]; 
 	  tau_1207_Si3_dR[iconv] = k2_conv_1207_Si3 * rho_wk_H_hires * Si3_Hfrac / b_Si;
+	  tau_1394_Si4_dR[iconv] = k2_conv_1394_Si4 * rho_wk_H_hires * Si4_Hfrac / b_Si;
+	  tau_1403_Si4_dR[iconv] = (k2_conv_1403_Si4 / k2_conv_1394_Si4) * tau_1394_Si4_dR[iconv];
+	  
 #endif	  // End SILICON
 	}
 
@@ -397,6 +411,8 @@ void compute_absorption()
 	  double tau_1193_Si2_sum = 0.0;
 	  double tau_1260_Si2_sum = 0.0;
 	  double tau_1207_Si3_sum = 0.0;
+	  double tau_1394_Si4_sum = 0.0;
+	  double tau_1403_Si4_sum = 0.0;
 #endif
 	  
 	  int iconv = 0;
@@ -407,15 +423,15 @@ void compute_absorption()
 #ifdef TAU_WEIGHT
 	  
 #if defined(HE2LYA) && defined(SILICON)
-#pragma omp parallel for reduction(+:tau_H1_sum, rho_tau_H1_sum, temp_tau_H1_sum, tau_He2_sum, rho_tau_He2_sum, temp_tau_He2_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum)
+#pragma omp parallel for reduction(+:tau_H1_sum, rho_tau_H1_sum, temp_tau_H1_sum, tau_He2_sum, rho_tau_He2_sum, temp_tau_He2_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum, tau_1394_Si4_sum, tau_1403_Si4_sum)
 #endif
 	 	  
 #if defined(HE2LYA) && !defined(SILICON)
 #pragma omp parallel for reduction(+:tau_H1_sum, rho_tau_H1_sum, temp_tau_H1_sum, tau_He2_sum, rho_tau_He2_sum, temp_tau_He2_sum)
 #endif
-	 	  
+	  
 #if !defined(HE2LYA) && defined(SILICON)
-#pragma omp parallel for reduction(+:tau_H1_sum, rho_tau_H1_sum, temp_tau_H1_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum)
+#pragma omp parallel for reduction(+:tau_H1_sum, rho_tau_H1_sum, temp_tau_H1_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum, tau_1394_Si4_sum, tau_1403_Si4_sum)
 #endif
 
 #if !defined(HE2LYA) && !defined(SILICON)	  
@@ -425,7 +441,7 @@ void compute_absorption()
 #else // Else TAUWEIGHT
 
 #if defined(HE2LYA) && defined(SILICON)
-#pragma omp parallel for reduction(+:tau_H1_sum, tau_He2_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum)
+#pragma omp parallel for reduction(+:tau_H1_sum, tau_He2_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum, tau_1394_Si4_sum, tau_1403_Si4_sum)
 #endif
 	 	  
 #if defined(HE2LYA) && !defined(SILICON)
@@ -433,7 +449,7 @@ void compute_absorption()
 #endif
 	  
 #if !defined(HE2LYA) && defined(SILICON)
-#pragma omp parallel for reduction(+:tau_H1_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum)
+#pragma omp parallel for reduction(+:tau_H1_sum, tau_1190_Si2_sum, tau_1193_Si2_sum, tau_1260_Si2_sum, tau_1207_Si3_sum, tau_1394_Si4_sum, tau_1403_Si4_sum)
 #endif
 	  
 #if !defined(HE2LYA) && !defined(SILICON)	  
@@ -566,6 +582,9 @@ void compute_absorption()
 	      tau_1193_Si2_sum += tau_1193_Si2_dR[iconv] * VSi_1;
 	      tau_1260_Si2_sum += tau_1260_Si2_dR[iconv] * VSi_1;
 	      tau_1207_Si3_sum += tau_1207_Si3_dR[iconv] * VSi_1;
+	      tau_1394_Si4_sum += tau_1394_Si4_dR[iconv] * VSi_1;
+	      tau_1403_Si4_sum += tau_1403_Si4_dR[iconv] * VSi_1;
+	      
 #endif 
 	      
 	    }
@@ -595,6 +614,8 @@ void compute_absorption()
 	      tau_1193_Si2[base_index] = tau_1193_Si2_sum;
 	      tau_1260_Si2[base_index] = tau_1260_Si2_sum;
 	      tau_1207_Si3[base_index] = tau_1207_Si3_sum;
+	      tau_1394_Si4[base_index] = tau_1394_Si4_sum;
+	      tau_1403_Si4[base_index] = tau_1403_Si4_sum;
 #endif
 	      
 	    }
@@ -835,6 +856,24 @@ void write_tau()
   fwrite(tau_1207_Si3,sizeof(double),nbins*nlos,output);
   fclose(output);
 
+  sprintf(fname, "%s/tauSi4_1394_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  if(!(output=fopen(fname,"wb")))
+    {
+      printf("can't open file `%s`\n\n",fname);
+      exit(1);
+    }
+  fwrite(tau_1394_Si4,sizeof(double),nbins*nlos,output);
+  fclose(output);
+  
+  sprintf(fname, "%s/tauSi4_1403_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  if(!(output=fopen(fname,"wb")))
+    {
+      printf("can't open file `%s`\n\n",fname);
+      exit(1);
+    }
+  fwrite(tau_1403_Si4,sizeof(double),nbins*nlos,output);
+  fclose(output);
+
 #endif
 
 }
@@ -957,6 +996,12 @@ void allocate_los_memory()
   
   tau_1207_Si3 = (double *)calloc(nlos*nbins, sizeof(double));
   if(NULL==tau_1207_Si3){free(tau_1207_Si3); printf("Memory allocation failed.\n"); exit(1);}
+
+  tau_1394_Si4 = (double *)calloc(nlos*nbins, sizeof(double));
+  if(NULL==tau_1394_Si4){free(tau_1394_Si4); printf("Memory allocation failed.\n"); exit(1);}
+  
+  tau_1403_Si4 = (double *)calloc(nlos*nbins, sizeof(double));
+  if(NULL==tau_1403_Si4){free(tau_1403_Si4); printf("Memory allocation failed.\n"); exit(1);}
 #endif
   
   
@@ -1006,6 +1051,8 @@ void free_los_memory()
   free(tau_1193_Si2);
   free(tau_1260_Si2);
   free(tau_1207_Si3);
+  free(tau_1394_Si4);
+  free(tau_1403_Si4);
 #endif
   
 }

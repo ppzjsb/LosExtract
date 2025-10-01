@@ -39,7 +39,7 @@ double lerp(double x, double x0, double x1, double y0, double y1);
 /* cloudy_tables.c */
 #ifdef SILICON
 void InitCloudy(void);
-void get_ionfrac(double logT, double lognH, double *Si2frac, double *Si3frac);
+void get_ionfrac(double logT, double lognH, double *Si2frac, double *Si3frac, double *Si4frac);
 void read_iontable(char *fname);
 void InitIonTableMemory(void);
 #endif

@@ -55,7 +55,7 @@ double ztime,omegam,omegal,omegab,h100,box100,Xh;
 
 /* Silicon */
 #define  SIMASS          28.085  /* Silicon atomic weight in a.m.u */
-#define  SI_SOLAR        3.236e-5  /* Asplund et al (2009), Table 1,  10^(7.60-12) */
+#define  SI_SOLAR        3.236e-5  /* Asplund et al (2009), Table 1,  10^(7.51-12) */
 #define  LAMBDA_1190_Si2 1190.4158e-8
 #define  FOSC_1190_Si2   0.2920
 #define  LAMBDA_1193_Si2 1193.2897e-8
@@ -64,6 +64,10 @@ double ztime,omegam,omegal,omegab,h100,box100,Xh;
 #define  FOSC_1260_Si2   1.180
 #define  LAMBDA_1207_Si3 1206.50e-8
 #define  FOSC_1207_Si3   1.63000
+#define  LAMBDA_1394_Si4 1393.76018e-8
+#define  FOSC_1394_Si4   0.513
+#define  LAMBDA_1403_Si4 1402.77291e-8
+#define  FOSC_1403_Si4   0.254
 
 /* Line profile table */
 #define XMAX  100.0

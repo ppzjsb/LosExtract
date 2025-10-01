@@ -129,6 +129,17 @@ if SILICON eq 1 then begin
    tau_Si3_1207 = dblarr(numlos*nbins)
    readu,9,tau_Si3_1207
    close,9
+
+   openr,10,filename10
+   tau_Si4_1394 = dblarr(numlos*nbins)
+   readu,10,tau_Si4_1394
+   close,10
+
+   openr,11,filename11
+   tau_Si4_1403 = dblarr(numlos*nbins)
+   readu,11,tau_Si4_1403
+   close,11
+   
 endif
 
 
