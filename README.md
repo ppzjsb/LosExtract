@@ -58,8 +58,17 @@ Faucher-Giguere 2020, MNRAS, 493, 1614.
 cloudy_tables/ contains a pre-computed look-up table with metal ion
 fractions as a function of temperature, density and redshift.  At
 present, only Si-II, Si-III and Si-IV abundances are available.  These
-have been computed assuming the Puchwein et al. 2019 UV background
-model.
+have been computed assuming various UV background models.
+
+1) Puchwein et al. (2019)  (p19)
+2) Faucher-Giguere (2020)  (fg20)
+3) Khaire & Srianand (2019) for alpha=1.4 (k19_q14)
+4) Khaire & Srianand (2019) for alpha=1.6 (k19_q16)
+5) Khaire & Srianand (2019) for alpha=1.8 (k19_q18)
+6) Khaire & Srianand (2019) for alpha=2.0 (k19_q20)
+
+where for k19, alpha is the power-law spectral index of the quasar
+spectrum (see their Eq. 12 and 13 and Table 1)
 
 idl_readdata/ contains a simple IDL code that reads in the output from
 SpecExtract.

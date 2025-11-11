@@ -153,7 +153,7 @@ void compute_absorption()
 
 #ifdef RESAMPLE
 
-  double Tth = 1.0e4;
+  double Tth = 5.0e3;
   double vth = 1.0e-5 * sqrt(BOLTZMANN * Tth / (HMASS * AMU)); /* in km/s, assumes T=10^4 K */
   
 #ifdef HE2LYA
@@ -188,7 +188,9 @@ void compute_absorption()
   double vmax2 = 0.5 * vmax;
   double rhoc  = 3.0 * (H0*h100) * (H0*h100) / (8.0 * PI * GRAVITY); /* g cm^-3 */
   double critH = rhoc * omegab * Xh / (atime * atime * atime); /* g cm^-3*/
-  
+
+    
+    
   
   /* HI Lyman-alpha (1216) */
   double u_H1[nbins*nhires], b_H1, b2_H1[nbins*nhires], tau_H1_dR[nbins*nhires];
@@ -230,6 +232,7 @@ void compute_absorption()
   
   double Si2frac, Si3frac, Si4frac;
 
+  /* Note: these should be in functions */
   double sigma_1190_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1190_Si2 * FOSC_1190_Si2;
   double sigma_1193_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1193_Si2 * FOSC_1193_Si2;
   double sigma_1260_Si2   = sqrt(3.0*PI*SIGMA_T/8.0) * LAMBDA_1260_Si2 * FOSC_1260_Si2;
@@ -418,7 +421,9 @@ void compute_absorption()
 	  int iconv = 0;
 
 
-	  
+
+
+	  /* This could be cleaned up a bit */
 #ifdef OPENMP
 #ifdef TAU_WEIGHT
 	  
@@ -555,7 +560,7 @@ void compute_absorption()
 #endif
 	      
 	      
-	      /* Optionally compute SiII and SiIII absorption */
+	      /* Optionally compute silicon absorption */
 #ifdef SILICON 
 	      double VSi_0  = vdiff_H1 * vdiff_H1 / b2_Si[iconv]; 
 	      
