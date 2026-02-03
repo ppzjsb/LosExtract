@@ -153,7 +153,7 @@ void compute_absorption()
 
 #ifdef RESAMPLE
 
-  double Tth = 5.0e3;
+  double Tth = 1.0e3;
   double vth = 1.0e-5 * sqrt(BOLTZMANN * Tth / (HMASS * AMU)); /* in km/s, assumes T=10^4 K */
   
 #ifdef HE2LYA
