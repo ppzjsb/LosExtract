@@ -16,9 +16,11 @@ Code requirements are a C compiler with (optionally) OpenMP. See e.g.
 https://www.openmp.org/resources/openmp-compilers-tools/
 
 To compile the code, at the command line type:
+
 make
 
 To run the code, at the command line type:
+
 ./LosExtract &lt;path&gt;
 
 where:
@@ -34,8 +36,10 @@ Compile time options are included in the Makefile, along with descriptions.
 
 If changing the compile time options one should generate a new binary.
 To do this, at the command line type:
+
 make clean
-make
+
+and then recompile.
 
 
 ADDITIONAL FILES:
@@ -47,12 +51,15 @@ are mainly variations on the Puchwein et al. 2019 model used for the
 Sherwood-Relics project.  See e.g.
 
 Puchwein et al. 2019, MNRAS, 485, 47.
-Puchwein et al. 2022, MNRAS, 519, 6162.
+
+Puchwein et al. 2023, MNRAS, 519, 6162.
 
 Some other models from these papers are also included in case useful
 
 Haardt &amp; Madau, 2012, ApJ, 746, 125.
+
 Khaire &amp; Srianand, 2019, MNRAS, 484, 4174.
+
 Faucher-Giguere 2020, MNRAS, 493, 1614.
 
 cloudy_tables/ contains a pre-computed look-up table with metal ion

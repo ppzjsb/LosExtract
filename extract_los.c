@@ -768,8 +768,8 @@ void write_tau()
   char fname[400];
   FILE *output;
    
-  sprintf(fname, "%s/tauH1_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
-  
+  //sprintf(fname, "%s/tauH1_v%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
+  sprintf(fname, "%s/tau%d_n%d_z%.3f.dat",path,nbins,nlos,ztime_file);
   
   if(!(output=fopen(fname,"wb")))
     {

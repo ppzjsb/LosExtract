@@ -1,11 +1,11 @@
 
 /*---------------------- Global parameters ---------------------------*/
 
-#define NLOSFILES 1 /* Number of LOS files to extract */
+#define NLOSFILES 6 /* Number of LOS files to extract */
 
-#define ZI_LOS 3.0  /* Redshift of first LOS file */
+#define ZI_LOS 2.0  /* Redshift of first LOS file */
 
-#define DZ_LOS 1.0  /* Output interval in Delta z for LOS files.
+#define DZ_LOS 0.4  /* Output interval in Delta z for LOS files.
 		       Irrelevant if NLOSFILES=1 */
 
 #define LOSBASE "los2048_n5000"  /* The base of the LOS file name */
